@@ -34,15 +34,14 @@ func getPixels(r io.Reader) ([]color.Color, error) {
 	}
 
 	bounds := img.Bounds()
-	minX, minY := img.Bounds().Min.X, img.Bounds().Min.Y
-	maxX, maxY := img.Bounds().Max.X, img.Bounds().Max.Y
+	width, height := bounds.Dx(), bounds.Dy()
+	pixels := make([]color.Color, width*height)
 
-	pixels := make([]color.Color, bounds.Dx()*bounds.Dy())
-
-	for i := minX; i < maxX; i++ {
-		for j := minY; j < maxY; j++ {
-			idx := i*bounds.Dx() + j
-			pixels[idx] = img.At(i, j)
+	idx := 0
+	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+		for x := bounds.Min.X; x < bounds.Max.X; x++ {
+			pixels[idx] = img.At(x, y)
+			idx++
 		}
 	}
 

@@ -1,6 +1,8 @@
 package colors
 
-import "math"
+import (
+	"math"
+)
 
 func DistanceLab(a, b *Lab) float64 {
 	deltaL := float64(b.L - a.L)
@@ -14,10 +16,12 @@ func DistanceMatrix(colors []*Lab) [][]float64 {
 	n := len(colors)
 
 	res := make([][]float64, n)
+	for i := range res {
+		res[i] = make([]float64, n)
+	}
 
 	// Fill distance matrix
 	for i := range n {
-		res[i] = make([]float64, n)
 		res[i][i] = 0
 		for j := i + 1; j < n; j++ {
 			dist := DistanceLab(colors[i], colors[j])
