@@ -5,7 +5,7 @@ import (
 	"math/rand"
 )
 
-func SelectCenters(k int, distances [][]float64) ([]int, error) {
+func SelectInitialCenters(k int, distances [][]float64) ([]int, error) {
 	rows := len(distances)
 	if rows < k {
 		return []int{}, fmt.Errorf("at least %d points are needed to calculate %d cluster centers", k, k)
