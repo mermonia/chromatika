@@ -101,6 +101,12 @@ func normalizeRGB(value uint8) float32 {
 }
 
 func scaleNRGB(value float32) uint8 {
+	if value < 0 {
+		value = 0
+	}
+	if value > 1 {
+		value = 1
+	}
 	return uint8(value * 255.0)
 }
 

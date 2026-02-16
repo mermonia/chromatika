@@ -34,9 +34,9 @@ func TestRGBtoLab(t *testing.T) {
 
 func TestLabToRGB(t *testing.T) {
 	a := &Lab{
-		L: 60,
-		A: 50,
-		B: 30,
+		L: 97.994507,
+		A: -1.998246,
+		B: 13.995831,
 	}
 
 	rgb, err := LabToRGB(a)
