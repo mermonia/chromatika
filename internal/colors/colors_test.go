@@ -31,3 +31,18 @@ func TestRGBtoLab(t *testing.T) {
 		log.Fatalf("could not convert: %s", err.Error())
 	}
 }
+
+func TestLabToRGB(t *testing.T) {
+	a := &Lab{
+		L: 60,
+		A: 50,
+		B: 30,
+	}
+
+	rgb, err := LabToRGB(a)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(rgb.R, rgb.G, rgb.B)
+}
