@@ -106,5 +106,14 @@ func ExecuteExtract(cmdCfg *ExtractCommandOptions) error {
 		cmdCfg.Clusters,
 	)
 
+	for _, color := range extractedColors {
+		render, err := color.Render(3)
+		if err != nil {
+			return fmt.Errorf("could not render color: %w", err)
+		}
+		fmt.Print(render)
+	}
+	fmt.Println()
+
 	return nil
 }

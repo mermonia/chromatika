@@ -5,7 +5,21 @@ import (
 	"math"
 
 	"github.com/mermonia/chromatika/internal/utils"
+	"github.com/charmbracelet/lipgloss"
 )
+
+func (c *Lab) Render(width int) (string, error) {
+	rgb, err := LabToRGB(c)
+	if err != nil {
+		return "", fmt.Errorf("could not convert from lab to rgb: %w", err)
+	}
+	style := lipgloss.NewStyle().
+	Background(lipgloss.Color(
+		fmt.Sprintf("#%02x%02x%02x", rgb.R, rgb.G, rgb.B),
+	)).Width(width)
+
+	return style.Render(" "), nil
+}
 
 func LabToRGB(in *Lab) (*Rgb, error) {
 	workingMatData := [][]float32{
