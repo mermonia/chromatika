@@ -38,7 +38,7 @@ func getPixels(r io.Reader, newW int) ([]color.Color, error) {
 	bounds := img.Bounds()
 	width, height := bounds.Dx(), bounds.Dy()
 
-	if newW != 0 {
+	if newW != 0 && newW < width {
 		scaleFactor := width / newW
 		width, height = width/scaleFactor, height/scaleFactor
 
