@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/mermonia/chromatika/internal/utils"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/mermonia/chromatika/internal/utils"
 )
 
 func (c *Lab) Render(width int) (string, error) {
@@ -14,11 +14,33 @@ func (c *Lab) Render(width int) (string, error) {
 		return "", fmt.Errorf("could not convert from lab to rgb: %w", err)
 	}
 	style := lipgloss.NewStyle().
-	Background(lipgloss.Color(
-		fmt.Sprintf("#%02x%02x%02x", rgb.R, rgb.G, rgb.B),
-	)).Width(width)
+		Background(lipgloss.Color(
+			fmt.Sprintf("#%02x%02x%02x", rgb.R, rgb.G, rgb.B),
+		)).Width(width)
 
 	return style.Render(" "), nil
+}
+
+func (c *Lab) GetChroma() float64 {
+	return math.Sqrt(float64(c.A*c.A + c.B*c.B))
+}
+
+func (c *Lab) GetHue() float64 {
+	hue := math.Atan2(float64(c.A), float64(c.B)) * 180 / math.Pi
+	if hue < 0 {
+		hue += 360
+	}
+	return hue
+}
+
+func LabToLCH(in *Lab) *LCHab {
+	out := &LCHab{
+		L: in.L,
+		C: float32(in.GetChroma()),
+		H: float32(in.GetHue()),
+	}
+
+	return out
 }
 
 func LabToRGB(in *Lab) (*Rgb, error) {
@@ -39,9 +61,9 @@ func LabToRGB(in *Lab) (*Rgb, error) {
 	}
 
 	linearNRgb := &NRgb{
-		R: convertedMat.At(0,0),
-		G: convertedMat.At(1,0),
-		B: convertedMat.At(2,0),
+		R: convertedMat.At(0, 0),
+		G: convertedMat.At(1, 0),
+		B: convertedMat.At(2, 0),
 	}
 
 	compandedNRgb := compandedNRGB(linearNRgb)
@@ -57,29 +79,29 @@ func LabToXyz(in *Lab) *Xyz {
 
 	// Transformations
 	fY := (in.L + 16) / 116
-	fX := (in.A/500) + fY
-	fZ := fY - (in.B/200)
+	fX := (in.A / 500) + fY
+	fZ := fY - (in.B / 200)
 
 	// Threshold values
 	var e float32 = 0.008856
 	var k float32 = 903.3
 
 	// Normal values
-	x := fX*fX*fX
-	y := fY*fY*fY
-	z := fZ*fZ*fZ
+	x := fX * fX * fX
+	y := fY * fY * fY
+	z := fZ * fZ * fZ
 
 	// Over-theshold transformations
 	if x <= e {
-		x = (116*fX - 16)/k
+		x = (116*fX - 16) / k
 	}
 
 	if in.L <= k*e {
-		y = in.L/k
+		y = in.L / k
 	}
 
 	if z <= e {
-		z = (116*fZ - 16)/k
+		z = (116*fZ - 16) / k
 	}
 
 	xyz := &Xyz{
@@ -105,6 +127,5 @@ func compand(value float32) float32 {
 	if value <= 0.0031308 {
 		return value * 12.92
 	}
-	return float32(1.055 * math.Pow(float64(value), 1/2.4) - 0.055)
+	return float32(1.055*math.Pow(float64(value), 1/2.4) - 0.055)
 }
-

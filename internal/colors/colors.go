@@ -20,6 +20,10 @@ type Xyz struct {
 	X, Y, Z float32
 }
 
+type LCHab struct {
+	L, C, H float32
+}
+
 func (col *NRgb) ToMatrix() *utils.Matrix {
 	data := [][]float32{
 		{col.R},

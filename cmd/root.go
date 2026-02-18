@@ -20,8 +20,9 @@ func Execute() {
 		Usage:       "dominant color extraction cli",
 		HideHelp:    false,
 		HideVersion: false,
-		Commands:    []*cli.Command{
+		Commands: []*cli.Command{
 			&ExtractCommand,
+			&PaletteCommand,
 		},
 	}
 
