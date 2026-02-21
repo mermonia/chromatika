@@ -41,6 +41,7 @@ var PaletteCommand cli.Command = cli.Command{
 			Value: "",
 		},
 	},
+	Commands: []*cli.Command{},
 	Flags: []cli.Flag{
 		&cli.IntFlag{
 			Name:    "clusters",
@@ -101,6 +102,8 @@ func ExecutePalette(cmdCfg *PaletteCommandOptions) error {
 	}
 
 	primaryColor := evaluation.ChoosePrimaryColor(dominantColors, partMatrix)
+	backgroundColor := evaluation.ChooseBackgroundColor(dominantColors, partMatrix)
+
 	return nil
 }
 
