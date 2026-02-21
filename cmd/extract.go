@@ -8,8 +8,7 @@ import (
 	"github.com/urfave/cli/v3"
 
 	"github.com/mermonia/chromatika/internal/clustering"
-	"github.com/mermonia/chromatika/internal/input"
-	"github.com/mermonia/chromatika/internal/quantization"
+	"github.com/mermonia/chromatika/internal/extraction"
 )
 
 type ExtractCommandOptions struct {
@@ -93,28 +92,23 @@ var ExtractCommand cli.Command = cli.Command{
 }
 
 func ExecuteExtract(cmdCfg *ExtractCommandOptions) error {
-	pixels, err := input.ReadImage(cmdCfg.ImagePath, cmdCfg.ScaleWidth)
-	if err != nil {
-		return fmt.Errorf("could not read image: %w", err)
-	}
-
-	labColors, err := quantization.GetRawLabArray(pixels)
-	if err != nil {
-		return fmt.Errorf("could not get lab color array: %w", err)
-	}
-
-	quantizedColors, np := quantization.Quantize(cmdCfg.QuantInterval, labColors)
-
-	extractedColors, _, err := clustering.FCM(
-		quantizedColors,
-		np,
-		cmdCfg.Fuzziness,
-		cmdCfg.Threshold,
-		cmdCfg.MaxIter,
-		cmdCfg.Clusters,
+	dominantColors, _, err := extraction.GetDominantColors(
+		cmdCfg.ImagePath,
+		cmdCfg.ScaleWidth,
+		cmdCfg.QuantInterval,
+		clustering.FCMParameters{
+			M: cmdCfg.Fuzziness,
+			E: cmdCfg.Threshold,
+			B: cmdCfg.MaxIter,
+			K: cmdCfg.Clusters,
+		},
 	)
 
-	for _, color := range extractedColors {
+	if err != nil {
+		return fmt.Errorf("could not extract dominant colors: %w", err)
+	}
+
+	for _, color := range dominantColors {
 		render, err := color.Render(3)
 		if err != nil {
 			return fmt.Errorf("could not render color: %w", err)

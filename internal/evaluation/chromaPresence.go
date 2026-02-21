@@ -33,6 +33,11 @@ func chooseFromColorPresence(cols []*colors.Lab, partMatrix [][]float64, comp fu
 		chroma := color.GetChroma()
 		eval := presence * chroma
 
+		if i == 0 {
+			bestEval = eval
+			chosenColor = color
+		}
+
 		if comp(eval, bestEval) {
 			bestEval = eval
 			chosenColor = color

@@ -7,36 +7,41 @@ import (
 	"github.com/mermonia/chromatika/internal/colors"
 )
 
-func FCM(cols []*colors.Lab, np []int, m, e float64, B, k int) ([]*colors.Lab, [][]float64, error) {
+type FCMParameters struct {
+	M, E float64
+	B, K int
+}
+
+func FCM(cols []*colors.Lab, np []int, params FCMParameters) ([]*colors.Lab, [][]float64, error) {
 	// Pre-calculation of color distances
 	distanceMat := colors.DistanceMatrix(cols)
 
 	// Inital center selection
-	initialCenters, err := SelectInitialCenters(k, distanceMat)
+	initialCenters, err := SelectInitialCenters(params.K, distanceMat)
 	if err != nil {
 		return nil, nil, fmt.Errorf("could not calculate initial cluster centers: %w", err)
 	}
 
-	centers := make([]*colors.Lab, k)
+	centers := make([]*colors.Lab, params.K)
 	for i, cidx := range initialCenters {
 		centers[i] = cols[cidx]
 	}
 
 	// Iteration counter and difference metric init
-	var b int = 0
+	var iters int = 0
 	var difference float64 = math.MaxFloat64
 
 	// Partition matrix
 	var partitionMat [][]float64
 
 	// Main algorithm
-	for b <= B && difference >= e {
-		partitionMat = calculatePartitionMatrix(cols, centers, m)
-		newCenters := calculateCenters(cols, partitionMat, np, m)
+	for iters <= params.B && difference >= params.E {
+		partitionMat = calculatePartitionMatrix(cols, centers, params.M)
+		newCenters := calculateCenters(cols, partitionMat, np, params.M)
 
 		difference = calculateDifference(newCenters, centers)
 		centers = newCenters
-		b++
+		iters++
 	}
 
 	return centers, partitionMat, nil
