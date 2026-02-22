@@ -111,8 +111,11 @@ func ExecutePaletteImage(cmdCfg *PaletteImageCommandOptions) error {
 	primaryColor := evaluation.ChoosePrimaryColor(dominantColors, partMatrix)
 	backgroundColor := evaluation.ChooseBackgroundColor(dominantColors, partMatrix)
 
-	fmt.Println(primaryColor)
-	fmt.Println(backgroundColor)
+	primaryColorBlock, _ := primaryColor.Render(3)
+	backgroundColorBlock, _ := backgroundColor.Render(3)
+
+	fmt.Printf("Primary color: %s\n", primaryColorBlock)
+	fmt.Printf("Background color: %s\n", backgroundColorBlock)
 
 	return nil
 }
