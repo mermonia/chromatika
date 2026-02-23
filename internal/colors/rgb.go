@@ -4,8 +4,22 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/charmbracelet/lipgloss"
 	"github.com/mermonia/chromatika/internal/utils"
 )
+
+func (c *Rgb) Render(width int) string {
+	style := lipgloss.NewStyle().
+		Background(lipgloss.Color(
+			fmt.Sprintf("#%02x%02x%02x", c.R, c.G, c.B),
+		)).Width(width)
+
+	return style.Render(" ")
+}
+
+func (c *Rgb) String() string {
+	return c.Render(3)
+}
 
 func RGBtoNRGB(in *Rgb) *NRgb {
 	out := &NRgb{

@@ -23,6 +23,7 @@ func Execute() {
 		Commands: []*cli.Command{
 			&ExtractCommand,
 			&PaletteCommand,
+			&AnalyzeCommand,
 		},
 	}
 
