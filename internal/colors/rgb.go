@@ -131,4 +131,3 @@ func gammaCorrect(value float32) float32 {
 
 	return float32(math.Pow(float64((value+0.055)/1.055), 2.4))
 }
-

@@ -6,8 +6,10 @@ import (
 	"path/filepath"
 
 	"github.com/mermonia/chromatika/internal/clustering"
+	"github.com/mermonia/chromatika/internal/colors"
 	"github.com/mermonia/chromatika/internal/evaluation"
 	"github.com/mermonia/chromatika/internal/extraction"
+	"github.com/mermonia/chromatika/internal/palette"
 	"github.com/urfave/cli/v3"
 )
 
@@ -111,8 +113,14 @@ func ExecutePaletteImage(cmdCfg *PaletteImageCommandOptions) error {
 	primaryColor := evaluation.ChoosePrimaryColor(dominantColors, partMatrix)
 	backgroundColor := evaluation.ChooseBackgroundColor(dominantColors, partMatrix)
 
-	fmt.Println(primaryColor)
-	fmt.Println(backgroundColor)
+	primaryColorBlock, _ := primaryColor.Render(3)
+	backgroundColorBlock, _ := backgroundColor.Render(3)
+
+	fmt.Printf("Primary color: %s\n", primaryColorBlock)
+	fmt.Printf("Background color: %s\n", backgroundColorBlock)
+
+	neutrals := palette.GenerateNeutrals(colors.LabToLCH(backgroundColor))
+	fmt.Print(neutrals)
 
 	return nil
 }
