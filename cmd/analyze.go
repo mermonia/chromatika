@@ -58,10 +58,11 @@ func ExecuteAnalyze(cmdCfg *AnalyzeCommandOptions) error {
 	if err != nil {
 		return fmt.Errorf("could not convert to lab: %w", err)
 	}
-	fmt.Printf("Luminosity: %f\n", lab.L)
-
 	lch := colors.LabToLCH(lab)
+
+	fmt.Printf("Luminosity: %f\n", lch.L)
 	fmt.Printf("Chroma: %f\n", lch.C)
+	fmt.Printf("Hue: %f\n", lch.H)
 
 	return nil
 }
