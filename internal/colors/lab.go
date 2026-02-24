@@ -21,6 +21,11 @@ func (c *Lab) Render(width int) (string, error) {
 	return style.Render(" "), nil
 }
 
+func (c *Lab) String() string {
+	block, _ := c.Render(3)
+	return block
+}
+
 func (c *Lab) GetChroma() float64 {
 	return math.Sqrt(float64(c.A*c.A + c.B*c.B))
 }
