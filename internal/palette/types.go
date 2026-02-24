@@ -21,7 +21,7 @@ type NeutralColors struct {
 
 	Text,
 	Subtext0,
-	Subtext1 colors.LCHab
+	Subtext1 *colors.LCHab
 }
 
 type AccentColors struct {
@@ -34,5 +34,5 @@ type AccentColors struct {
 	Success,
 	Warning,
 
-	ExtraAccent colors.LCHab
+	ExtraAccent *colors.LCHab
 }
