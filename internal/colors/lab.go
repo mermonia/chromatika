@@ -31,7 +31,7 @@ func (c *Lab) GetChroma() float64 {
 }
 
 func (c *Lab) GetHue() float64 {
-	hue := math.Atan2(float64(c.A), float64(c.B)) * 180 / math.Pi
+	hue := math.Atan2(float64(c.B), float64(c.A)) * 180 / math.Pi
 	if hue < 0 {
 		hue += 360
 	}

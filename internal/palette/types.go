@@ -7,6 +7,11 @@ type Palette struct {
 	Accents  AccentColors
 }
 
+const NEUTRAL_COLORS int = 12
+const NEUTRAL_BG_COLORS int = 3
+
+const ACCENT_COLORS int = 8
+
 type NeutralColors struct {
 	Base,
 	Mantle,
@@ -18,6 +23,7 @@ type NeutralColors struct {
 
 	Overlay0,
 	Overlay1,
+	Overlay2,
 
 	Text,
 	Subtext0,

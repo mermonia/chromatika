@@ -7,113 +7,150 @@ import (
 )
 
 // The following are opinionated values, and are subject to change
-const DARK_MODE_THRESHOLD float32 = 0.5
-const MAXIMUM_NEUTRAL_CHROMA float32 = 0.12
 
-var LUMINOSITY_DELTAS []float32 = []float32{
-	0,  // base
-	-2, // mantle
-	-4, // crust
-	3,  // surface-0
-	6,  // surface-1
-	9,  // surface-2
-	12, // overlay-0
-	15, // overlay-1
-	55, // text
-	40, // subtext-0
-	30, // subtext-1
-}
+// The base luminosity value threshold for dark mode; any palette generated from
+// a color with a higher luminosity will be a light mode palette.
+const DARK_MODE_LUMINOSITY_THRESHOLD float32 = 50.0
 
-var CHROMA_LIGHT_MODE []float32 = []float32{
-	3,   // base
-	2,   // mantle
-	1.5, // crust
-	3,   // surface-0
-	3.5, // surface-1
-	4,   // surface-2
-	3,   // overlay-0
-	2,   // overlay-1
-	1,   // text
-	1,   // subtext-0
-	1,   // subtext-1
-}
+// The luminosity values for the darkest and brightest colors of the neutral
+// palette, respectively
+const DARK_MINIMUM_NEUTRAL_LUMINOSITY float32 = 10.0
+const DARK_MAXIMUM_NEUTRAL_LUMINOSITY float32 = 90.0
 
-var CHROMA_DARK_MODE []float32 = []float32{
-	4,    // base
-	3,    // mantle
-	2,    // crust
-	4.5,  // surface-0
-	5,    // surface-1
-	5.5,  // surface-2
-	3,    // overlay-0
-	2,    // overlay-1
-	1,    // text
-	1.5,  // subtext-0
-	1.75, // subtext-1
-}
+const LIGHT_MINIMUM_NEUTRAL_LUMINOSITY float32 = 5.0
+const LIGHT_MAXIMUM_NEUTRAL_LUMINOSITY float32 = 90.0
+
+// For each generated color, the proportion between its luminosity and chroma values.
+const DARK_FIRST_LUMINOSITY_CHROMA_PROPORTION float32 = 0.5
+const DARK_LAST_LUMINOSITY_CHROMA_PROPORTION float32 = 4.0
+
+const LIGHT_FIRST_LUMINOSITY_CHROMA_PROPORTION float32 = 1.0
+const LIGHT_LAST_LUMINOSITY_CHORMA_PROPORTION float32 = 15.0
+
+// The luminosity difference between background colors (base, mantle and crust).
+const BG_COLORS_LUMINOSITY_DELTA float32 = 4.0
 
 func GenerateNeutrals(baseline *colors.LCHab) *NeutralColors {
-	if baseline.L > DARK_MODE_THRESHOLD {
+	if baseline.L > DARK_MODE_LUMINOSITY_THRESHOLD {
 		return generateLightModeNeutrals(baseline)
 	}
 	return generateDarkModeNeutrals(baseline)
 }
 
 func generateLightModeNeutrals(baseline *colors.LCHab) *NeutralColors {
-	cols := make([]*colors.LCHab, len(LUMINOSITY_DELTAS))
-	for i := range LUMINOSITY_DELTAS {
+	luminosities := generateLuminosityGradient(
+		LIGHT_MINIMUM_NEUTRAL_LUMINOSITY,
+		LIGHT_MAXIMUM_NEUTRAL_LUMINOSITY,
+		BG_COLORS_LUMINOSITY_DELTA,
+		NEUTRAL_COLORS,
+		NEUTRAL_BG_COLORS,
+	)
+
+	chromas := generateChromaGradient(
+		luminosities,
+		LIGHT_FIRST_LUMINOSITY_CHROMA_PROPORTION,
+		LIGHT_LAST_LUMINOSITY_CHORMA_PROPORTION,
+	)
+
+	cols := make([]*colors.LCHab, len(luminosities))
+	for i := range len(luminosities) {
 		cols[i] = &colors.LCHab{
-			L: clampLuminosity(baseline.L - LUMINOSITY_DELTAS[i]),
-			C: CHROMA_LIGHT_MODE[i],
+			L: luminosities[i],
+			C: chromas[i],
 			H: baseline.H,
 		}
 	}
 
 	return &NeutralColors{
-		Base:     cols[0],
-		Mantle:   cols[1],
-		Crust:    cols[2],
-		Surface0: cols[3],
-		Surface1: cols[4],
-		Surface2: cols[5],
-		Overlay0: cols[6],
-		Overlay1: cols[7],
-		Text:     cols[8],
-		Subtext0: cols[9],
-		Subtext1: cols[10],
+		Text:     cols[0],
+		Subtext0: cols[1],
+		Subtext1: cols[2],
+		Overlay2: cols[3],
+		Overlay1: cols[4],
+		Overlay0: cols[5],
+		Surface2: cols[6],
+		Surface1: cols[7],
+		Surface0: cols[8],
+		Crust:    cols[9],
+		Mantle:   cols[10],
+		Base:     cols[11],
 	}
 }
 
 func generateDarkModeNeutrals(baseline *colors.LCHab) *NeutralColors {
-	cols := make([]*colors.LCHab, len(LUMINOSITY_DELTAS))
-	for i := range LUMINOSITY_DELTAS {
+	luminosities := generateLuminosityGradient(
+		DARK_MINIMUM_NEUTRAL_LUMINOSITY,
+		DARK_MAXIMUM_NEUTRAL_LUMINOSITY,
+		BG_COLORS_LUMINOSITY_DELTA,
+		NEUTRAL_COLORS,
+		NEUTRAL_BG_COLORS,
+	)
+
+	chromas := generateChromaGradient(
+		luminosities,
+		DARK_FIRST_LUMINOSITY_CHROMA_PROPORTION,
+		DARK_LAST_LUMINOSITY_CHROMA_PROPORTION,
+	)
+
+	cols := make([]*colors.LCHab, len(luminosities))
+	for i := range len(luminosities) {
 		cols[i] = &colors.LCHab{
-			L: clampLuminosity(baseline.L + LUMINOSITY_DELTAS[i]),
-			C: CHROMA_DARK_MODE[i],
+			L: luminosities[i],
+			C: chromas[i],
 			H: baseline.H,
 		}
 	}
 
 	return &NeutralColors{
-		Base:     cols[0],
+		Crust:    cols[0],
 		Mantle:   cols[1],
-		Crust:    cols[2],
+		Base:     cols[2],
 		Surface0: cols[3],
 		Surface1: cols[4],
 		Surface2: cols[5],
 		Overlay0: cols[6],
 		Overlay1: cols[7],
-		Text:     cols[8],
+		Overlay2: cols[8],
 		Subtext0: cols[9],
 		Subtext1: cols[10],
+		Text:     cols[11],
 	}
 }
 
-func clampLuminosity(l float32) float32 {
-	newL := min(l, 100)
-	newL = max(l, 0)
+func generateLuminosityGradient(minL, maxL, bgDelta float32, nColors, nBgColors int) []float32 {
+	luminosities := make([]float32, nColors)
+	currentLuminosity := minL
 
-	return newL
+	// bg colors luminosities
+	for i := range nBgColors {
+		luminosities[i] = currentLuminosity
+		currentLuminosity += bgDelta
+	}
+	currentLuminosity -= bgDelta
+
+	luminosityDelta := (maxL - currentLuminosity) / (float32(nColors - nBgColors))
+	// other colors luminosities
+	for i := nBgColors; i < nColors; i++ {
+		currentLuminosity += luminosityDelta
+		luminosities[i] = currentLuminosity
+	}
+
+	return luminosities
+}
+
+func generateChromaGradient(luminosities []float32, firstLC, lastLC float32) []float32 {
+	length := len(luminosities)
+	chromas := make([]float32, length)
+
+	proportionDelta := (lastLC - firstLC) / float32(length)
+	currentProportion := firstLC
+
+	for i := range length {
+		chromas[i] = luminosities[i] / currentProportion
+		currentProportion += proportionDelta
+	}
+
+	return chromas
 }
 
 func (n *NeutralColors) String() string {
@@ -129,13 +166,14 @@ func (n *NeutralColors) String() string {
 		"\nOverlay Colors:\n"+
 		"Overlay0: %v\n"+
 		"Overlay1: %v\n"+
+		"Overlay2: %v\n"+
 		"\nText Colors:\n"+
-		"Text: %v\n"+
 		"Subtext0: %v\n"+
-		"Subtext1: %v\n",
+		"Subtext1: %v\n"+
+		"Text: %v\n",
 		n.Base, n.Mantle, n.Crust,
 		n.Surface0, n.Surface1, n.Surface2,
-		n.Overlay0, n.Overlay1,
-		n.Text, n.Subtext0, n.Subtext1,
+		n.Overlay0, n.Overlay1, n.Overlay2,
+		n.Subtext0, n.Subtext1, n.Text,
 	)
 }
