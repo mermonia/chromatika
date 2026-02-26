@@ -30,11 +30,11 @@ const LIGHT_LAST_LUMINOSITY_CHORMA_PROPORTION float32 = 15.0
 // The luminosity difference between background colors (base, mantle and crust).
 const BG_COLORS_LUMINOSITY_DELTA float32 = 4.0
 
-func GenerateNeutrals(baseline *colors.LCHab) *NeutralColors {
-	if baseline.L > DARK_MODE_LUMINOSITY_THRESHOLD {
-		return generateLightModeNeutrals(baseline)
+func GenerateNeutrals(baseline *colors.LCHab, darkmode bool) *NeutralColors {
+	if darkmode {
+		return generateDarkModeNeutrals(baseline)
 	}
-	return generateDarkModeNeutrals(baseline)
+	return generateLightModeNeutrals(baseline)
 }
 
 func generateLightModeNeutrals(baseline *colors.LCHab) *NeutralColors {

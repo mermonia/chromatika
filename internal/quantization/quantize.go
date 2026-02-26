@@ -2,6 +2,7 @@ package quantization
 
 import (
 	"github.com/mermonia/chromatika/internal/colors"
+	"github.com/mermonia/chromatika/internal/utils"
 )
 
 func Quantize(q int, cols []*colors.Lab) ([]*colors.Lab, []int) {
@@ -56,19 +57,9 @@ func getColorIndex(q int, color *colors.Lab) int {
 	a := int((color.A + 120.0) / float32(q))
 	b := int((color.B + 120.0) / float32(q))
 
-	l = clamp(l, 0, 100/q-1)
-	a = clamp(a, 0, 240/q-1)
-	b = clamp(b, 0, 240/q-1)
+	l = utils.Clamp(l, 0, 100/q-1)
+	a = utils.Clamp(a, 0, 240/q-1)
+	b = utils.Clamp(b, 0, 240/q-1)
 
 	return l*levelsA*levelsB + a*levelsB + b
-}
-
-func clamp(n, min, max int) int {
-	if n > max {
-		return max
-	}
-	if n < min {
-		return min
-	}
-	return n
 }

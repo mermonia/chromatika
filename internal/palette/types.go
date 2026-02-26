@@ -34,11 +34,11 @@ type AccentColors struct {
 	Primary,
 	Secondary,
 	Tertiary,
-	Quaternary,
 
 	Error,
 	Success,
 	Warning,
 
-	ExtraAccent *colors.LCHab
+	ExtraAccent0,
+	ExtraAccent1 *colors.LCHab
 }

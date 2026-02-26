@@ -39,3 +39,13 @@ func LCHtoRGB(in *LCHab) (*Rgb, error) {
 	lab := LCHtoLab(in)
 	return LabToRGB(lab)
 }
+
+func RegularizeHue(h float32) float32 {
+	if h < 0 {
+		return h + 360
+	}
+	if h > 360 {
+		return h - 360
+	}
+	return h
+}
