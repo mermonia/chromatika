@@ -3,6 +3,7 @@ module github.com/mermonia/chromatika
 go 1.25.5
 
 require (
+	github.com/BurntSushi/toml v1.6.0
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/fatih/color v1.18.0
 	github.com/urfave/cli/v3 v3.6.2
