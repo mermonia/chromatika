@@ -2,16 +2,13 @@ package config
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"github.com/BurntSushi/toml"
 )
 
 const ConfigFileName string = "chromatika.toml"
 
-func LoadConfig(dir string) (*Config, error) {
-	path := filepath.Join(dir, ConfigFileName)
-
+func LoadConfig(path string) (*Config, error) {
 	c := &Config{}
 	if _, err := toml.DecodeFile(path, c); err != nil {
 		return nil, fmt.Errorf("could not decode config file: %w", err)
