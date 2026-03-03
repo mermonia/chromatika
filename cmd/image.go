@@ -119,13 +119,5 @@ func ExecutePaletteImage(cmdCfg *PaletteImageCommandOptions) error {
 	fmt.Printf("Primary color: %s\n", primaryColorBlock)
 	fmt.Printf("Background color: %s\n", backgroundColorBlock)
 
-	darkmode := backgroundColor.L < 50
-
-	neutrals := palette.GenerateNeutrals(colors.LabToLCH(backgroundColor), darkmode)
-	fmt.Print(neutrals)
-
-	accents := palette.GenerateAccents(colors.LabToLCH(primaryColor), darkmode)
-	fmt.Print(accents)
-
 	return nil
 }

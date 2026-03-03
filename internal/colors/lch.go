@@ -25,6 +25,10 @@ func (c *LCHab) String() string {
 	return block
 }
 
+func (c *LCHab) GetTemperature() float64 {
+	return math.Cos(float64(c.H) - 60)
+}
+
 func LCHtoLab(in *LCHab) *Lab {
 	out := &Lab{
 		L: in.L,
