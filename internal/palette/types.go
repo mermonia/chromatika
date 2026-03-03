@@ -3,42 +3,28 @@ package palette
 import "github.com/mermonia/chromatika/internal/colors"
 
 type Palette struct {
-	Neutrals NeutralColors
-	Accents  AccentColors
-}
+	// Special colors
+	Background,
+	Foreground,
+	Cursor,
 
-const NEUTRAL_COLORS int = 12
-const NEUTRAL_BG_COLORS int = 3
+	// Base colors
+	Color0,
+	Color1,
+	Color2,
+	Color3,
+	Color4,
+	Color5,
+	Color6,
+	Color7,
 
-const ACCENT_COLORS int = 8
-
-type NeutralColors struct {
-	Base,
-	Mantle,
-	Crust,
-
-	Surface0,
-	Surface1,
-	Surface2,
-
-	Overlay0,
-	Overlay1,
-	Overlay2,
-
-	Text,
-	Subtext0,
-	Subtext1 *colors.LCHab
-}
-
-type AccentColors struct {
-	Primary,
-	Secondary,
-	Tertiary,
-
-	Error,
-	Success,
-	Warning,
-
-	ExtraAccent0,
-	ExtraAccent1 *colors.LCHab
+	// Derived colors, variants of the 0-7 base colors
+	Color8,
+	Color9,
+	Color10,
+	Color11,
+	Color12,
+	Color13,
+	Color14,
+	Color15 colors.LCHab
 }
