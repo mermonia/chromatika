@@ -17,12 +17,12 @@ func deltaE00(a, b *colors.LCHab) float64 {
 	bA := float64(labB.A)
 
 	// Average chroma and luminosity
-	avgL := float64((a.L + b.L)/2)
-	avgC := float64((a.C + b.C)/2)
+	avgL := float64((a.L + b.L) / 2)
+	avgC := float64((a.C + b.C) / 2)
 
 	// G parameter for future calculations
 	avgCto7 := math.Pow(avgC, 7)
-	G := 0.5*(1-math.Sqrt(avgCto7/(avgCto7 + 6103515625)))
+	G := 0.5 * (1 - math.Sqrt(avgCto7/(avgCto7+6103515625)))
 
 	// Intermediate color generation
 	aAprime := float32(aA * (1 + G))
@@ -45,12 +45,12 @@ func deltaE00(a, b *colors.LCHab) float64 {
 
 	// T parameter for future calculations
 	avgHprime := float64(aPrime.H + bPrime.H)
-	if math.Abs(float64(aPrime.H - bPrime.H)) > 180 {
+	if math.Abs(float64(aPrime.H-bPrime.H)) > 180 {
 		avgHprime += 360
 	}
 	avgHprime /= 2
 
-	T := 1 - 0.17*utils.DegCos(avgHprime - 30) + 0.24*utils.DegCos(2*avgHprime) + 0.32*utils.DegCos(3*avgHprime+6) - 0.20*utils.DegCos(4*avgHprime-63)
+	T := 1 - 0.17*utils.DegCos(avgHprime-30) + 0.24*utils.DegCos(2*avgHprime) + 0.32*utils.DegCos(3*avgHprime+6) - 0.20*utils.DegCos(4*avgHprime-63)
 
 	// Delta calculations
 	deltaL := float64(bPrime.L - aPrime.L)
@@ -66,21 +66,21 @@ func deltaE00(a, b *colors.LCHab) float64 {
 		imDeltaH = hPrimeDiff - 360
 	}
 
-	deltaH := 2*math.Sqrt(float64(aPrime.C*bPrime.C))*utils.DegSin(imDeltaH/2)
+	deltaH := 2 * math.Sqrt(float64(aPrime.C*bPrime.C)) * utils.DegSin(imDeltaH/2)
 
 	// Calculation of S values
-	avgCprime := float64(aPrime.C + bPrime.C) / 2
+	avgCprime := float64(aPrime.C+bPrime.C) / 2
 
 	sL := 1 + (0.015*math.Pow(avgL-50, 2))/math.Sqrt(20+math.Pow(avgL-50, 2))
 	sC := 1 + 0.045*avgCprime
 	sH := 1 + 0.015*avgCprime*T
 
 	// Extra parameters
-	deltaTheta := 30 * math.Exp(-math.Pow((avgHprime - 275)/25, 2))
-	
+	deltaTheta := 30 * math.Exp(-math.Pow((avgHprime-275)/25, 2))
+
 	avgCprimeTo7 := math.Pow(avgCprime, 7)
-	Rc := 2*math.Sqrt(avgCprimeTo7/(avgCprimeTo7 + 6103515625))
-	Rt := -Rc*utils.DegSin(2*deltaTheta)
+	Rc := 2 * math.Sqrt(avgCprimeTo7/(avgCprimeTo7+6103515625))
+	Rt := -Rc * utils.DegSin(2*deltaTheta)
 
 	// Final component calculation
 	compL := deltaL / sL
@@ -88,11 +88,11 @@ func deltaE00(a, b *colors.LCHab) float64 {
 	compH := deltaH / sH
 
 	// Result
-	res := math.Sqrt( 
-		compL*compL + 
-		compC*compC +
-		compH*compH +
-		Rt*compC*compH,
+	res := math.Sqrt(
+		compL*compL +
+			compC*compC +
+			compH*compH +
+			Rt*compC*compH,
 	)
 
 	return res
