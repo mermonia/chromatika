@@ -6,10 +6,8 @@ import (
 	"path/filepath"
 
 	"github.com/mermonia/chromatika/internal/clustering"
-	"github.com/mermonia/chromatika/internal/colors"
 	"github.com/mermonia/chromatika/internal/evaluation"
 	"github.com/mermonia/chromatika/internal/extraction"
-	"github.com/mermonia/chromatika/internal/palette"
 	"github.com/urfave/cli/v3"
 )
 

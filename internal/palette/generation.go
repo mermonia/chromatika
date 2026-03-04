@@ -15,10 +15,13 @@ var defaultFuzziness float64 = 2.0
 var defaultThreshold float64 = 0.001
 var defaultMaxIterations int = 100
 
+const MIN_DELTAE00 = 20
+
 func GeneratePalette(imagePath string, darkmode bool) (*Palette, error) {
+	var suitableColors []*colors.LCHab
 	/*
-	Extract up to 32 colors from an image, check if there are enough
-	suitable colors to form a palette in each iteration.
+		Extract up to 32 colors from an image, check if there are enough
+		suitable colors to form a palette in each iteration.
 	*/
 	for i := range 16 {
 		labCols, _, err := extraction.GetDominantColors(
@@ -37,12 +40,18 @@ func GeneratePalette(imagePath string, darkmode bool) (*Palette, error) {
 		}
 
 		lchCols := utils.Map(labCols, colors.LabToLCH)
-		suitableColors, err := filterSuitableColors(lchCols)
+		suitableColors, err = filterSuitableColors(lchCols, false)
+		fmt.Printf("found %d suitable colors\n", len(suitableColors))
 
-		if len(suitableColors) >= 16 {
+		if len(suitableColors) >= 8 {
 			break
 		}
 	}
+
+	for _, color := range suitableColors {
+		fmt.Printf("L: %f, C: %f, H: %f\n%s\n\n", color.L, color.C, color.H, color)
+	}
+	fmt.Println()
 
 	return nil, nil
 }
@@ -50,6 +59,35 @@ func GeneratePalette(imagePath string, darkmode bool) (*Palette, error) {
 /*
 Returns a set of colors that are distinct enough to form a palette.
 */
-func filterSuitableColors(colors []*colors.LCHab) ([]*colors.LCHab, error) {
-	return nil, nil
+func filterSuitableColors(cols []*colors.LCHab, fast bool) ([]*colors.LCHab, error) {
+	g := getColorSimilarityGraph(cols, MIN_DELTAE00)
+	suitableColors := make([]*colors.LCHab, 0, len(cols))
+
+	var mis []int
+	if fast {
+		// mis = MIS_Fast(adjList)
+	} else {
+		mis = MIS_Complete(g)
+	}
+
+	for _, idx := range mis {
+		suitableColors = append(suitableColors, cols[idx])
+	}
+
+	return suitableColors, nil
+}
+
+func getColorSimilarityGraph(cols []*colors.LCHab, minDelta float64) *Graph {
+	g := NewGraph(len(cols))
+
+	for i := range cols {
+		for j := range i {
+			delta := deltaE00(cols[i], cols[j])
+			if delta < minDelta {
+				g.AddEdge(i, j)
+			}
+		}
+	}
+
+	return g
 }

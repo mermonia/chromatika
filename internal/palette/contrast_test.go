@@ -20,6 +20,6 @@ func TestDeltaE00(t *testing.T) {
 		H: 6,
 	}
 
-	difference := deltaE00(a,b)
-	fmt.Print(difference)
+	difference := deltaE00(a, b)
+	fmt.Println(difference)
 }
