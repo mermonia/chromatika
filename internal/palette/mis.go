@@ -1,5 +1,7 @@
 package palette
 
+import ()
+
 func MIS_Complete(g *Graph) []int {
 	if g.Empty() {
 		return []int{}
@@ -58,9 +60,29 @@ func MIS_Cycles(g *Graph) []int {
 				}
 			}
 		}
-		for i := 0; i < len(cycle); i += 2 {
+		limit := len(cycle)
+		if limit%2 == 1 {
+			limit--
+		}
+		for i := 0; i < limit; i += 2 {
 			result = append(result, cycle[i])
 		}
+	}
+	return result
+}
+
+func MIS_Fast(g *Graph) []int {
+	result := []int{}
+	for !g.Empty() {
+		var minDegreeV int
+		first := true
+		for i := range g.adjList {
+			if first || len(g.adjList[i]) < len(g.adjList[minDegreeV]) {
+				minDegreeV = i
+			}
+		}
+		result = append(result, minDegreeV)
+		g.RemoveNeighbors(minDegreeV)
 	}
 	return result
 }

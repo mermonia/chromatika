@@ -68,11 +68,12 @@ func (g *Graph) Clone() *Graph {
 }
 
 func (g *Graph) RemoveNeighbors(v int) {
-	neighbors := g.adjList[v]
+	neighbors := make([]int, len(g.adjList[v]))
+	copy(neighbors, g.adjList[v])
 	for _, n := range neighbors {
-		delete(g.adjList, n)
+		g.RemoveVertex(n)
 	}
-	delete(g.adjList, v)
+	g.RemoveVertex(v)
 }
 
 func (g *Graph) Size() (v, e int) {

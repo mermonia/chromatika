@@ -7,7 +7,8 @@ import (
 )
 
 func TestGeneratePalette(t *testing.T) {
-	_, err := GeneratePalette("/home/umbraslay/Pictures/Wallpapers/hatsune-miku-dark-2k.png", false)
+	file := "test-9.jpg"
+	_, err := GeneratePalette("/home/umbraslay/Pictures/Wallpapers/"+file, false)
 	if err != nil {
 		log.Fatal(err)
 	}
