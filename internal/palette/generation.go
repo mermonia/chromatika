@@ -149,7 +149,7 @@ func fillColorPalette(base []*colors.LCHab, targetSize int) []*colors.LCHab {
 	// Generate dark neutral color
 	if darkNeutral == nil {
 		newColors = append(newColors, &colors.LCHab{
-			L: 15,
+			L: 5,
 			C: 15,
 			H: dominantColor.H,
 		})
