@@ -6,7 +6,6 @@ type Palette struct {
 	// Special colors
 	Background,
 	Foreground,
-	Cursor,
 
 	// Base colors
 	Color0,
