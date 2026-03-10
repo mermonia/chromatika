@@ -2,6 +2,9 @@ package palette
 
 import ()
 
+// This algorithm always finds the MIS of vertices of a graph. It's time
+// complexity is approximately O(1.38^n), so it must be used with a relatively
+// small N.
 func MIS_Complete(g *Graph) []int {
 	if g.Empty() {
 		return []int{}
