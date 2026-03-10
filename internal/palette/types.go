@@ -1,6 +1,8 @@
 package palette
 
-import "github.com/mermonia/chromatika/internal/colors"
+import (
+	"github.com/mermonia/chromatika/internal/colors"
+)
 
 type Palette struct {
 	// Special colors
@@ -27,4 +29,20 @@ type Palette struct {
 	Color13,
 	Color14,
 	Color15 colors.LCHab
+}
+
+type RawColors struct {
+	// Neutral Colors
+	DarkNeutral,
+	LightNeutral *colors.LCHab
+
+	Colors [8]*colors.LCHab
+}
+
+func (rc *RawColors) String() string {
+	res := rc.DarkNeutral.String() + rc.LightNeutral.String() + " "
+	for i := range rc.Colors {
+		res += rc.Colors[i].String()
+	}
+	return res
 }

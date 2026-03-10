@@ -19,8 +19,8 @@ var defaultMaxIterations int = 100
 
 const MIN_DELTAE00 = 20
 
-const SEARCH_ITERATIONS = 4
-const N_CLUSTERS_STEP = 4
+const SEARCH_ITERATIONS = 1
+const N_CLUSTERS_STEP = 0
 
 const N_BASE_COLORS = 8
 
@@ -50,27 +50,14 @@ func GeneratePalette(imagePath string, darkmode bool) (*Palette, error) {
 		lchCols := utils.Map(labCols, colors.LabToLCH)
 
 		suitableColors = filterSuitableColors(lchCols, false)
-		fmt.Printf("found %d suitable colors\n", len(suitableColors))
 
 		if len(suitableColors) >= N_BASE_COLORS {
 			break
 		}
 	}
 
-	for _, color := range suitableColors {
-		fmt.Printf("L: %f, C: %f, H: %f\n%s\n\n", color.L, color.C, color.H, color)
-	}
-	fmt.Println()
-
-	if len(suitableColors) < N_BASE_COLORS {
-		suitableColors = fillColorPalette(suitableColors, N_BASE_COLORS)
-	}
-
-	fmt.Printf("NEW PALETTE: (%d colors)\n", len(suitableColors))
-	for _, color := range suitableColors {
-		fmt.Printf("L: %f, C: %f, H: %f\n%s\n\n", color.L, color.C, color.H, color)
-	}
-	fmt.Println()
+	rawColors := generateRawPalette(suitableColors)
+	fmt.Printf("Color Palette:\n%s\n", rawColors)
 
 	return nil, nil
 }
@@ -111,14 +98,10 @@ func getColorSimilarityGraph(cols []*colors.LCHab, minDelta float64) *Graph {
 	return g
 }
 
-func fillColorPalette(base []*colors.LCHab, targetSize int) []*colors.LCHab {
-	nMissingColors := targetSize - len(base)
-	if nMissingColors <= 0 {
-		return base
-	}
-
-	// Newly generated colors
-	var newColors []*colors.LCHab
+func generateRawPalette(base []*colors.LCHab) *RawColors {
+	// Base colors
+	newBaseColors := make([]*colors.LCHab, len(base))
+	copy(newBaseColors, base)
 
 	// Precompute deltaE00 matrix
 	deltaE00Mat := make([][]float64, len(base))
@@ -136,62 +119,66 @@ func fillColorPalette(base []*colors.LCHab, targetSize int) []*colors.LCHab {
 
 	// Ensure neutral light and neutral dark colors
 	var darkNeutral, lightNeutral *colors.LCHab
-	for _, color := range base {
-		if color.C < 5 {
-			if color.L > 92 {
-				lightNeutral = color
-			} else if color.L < 15 {
-				darkNeutral = color
-			}
+	for i := len(newBaseColors) - 1; i >= 0; i-- {
+		color := newBaseColors[i]
+
+		if color.C < 8 && color.L > 92 {
+			lightNeutral = color
+			newBaseColors = append(newBaseColors[:i], newBaseColors[i+1:]...)
+		}
+
+		if color.C < 15 && color.L < 15 {
+			darkNeutral = color
+			newBaseColors = append(newBaseColors[:i], newBaseColors[i+1:]...)
 		}
 	}
 
 	// Generate dark neutral color
 	if darkNeutral == nil {
-		newColors = append(newColors, &colors.LCHab{
-			L: 5,
-			C: 15,
+		darkNeutral = &colors.LCHab{
+			L: 8,
+			C: 10,
 			H: dominantColor.H,
-		})
-		nMissingColors--
+		}
 	}
 
 	// Generate light neutral color
 	if lightNeutral == nil {
-		newColors = append(newColors, &colors.LCHab{
+		lightNeutral = &colors.LCHab{
 			L: 92,
-			C: 10,
+			C: 6,
 			H: dominantColor.H,
-		})
-		nMissingColors--
+		}
 	}
 
-	// Mean deltaE00 for all base colors
-	meanDeltaE00 := averageDeltaE00(deltaE00Mat)
-
-	if meanDeltaE00 < 25.0 {
-		// contrast-neutral strategy
-		newColors = append(newColors, contrastNeutral(dominantColor, nMissingColors)...)
-	} else {
-		// harmonic expand strategy
-		newColors = append(newColors, harmonicExpand(dominantColor, nMissingColors)...)
+	rawColors := &RawColors{
+		LightNeutral: lightNeutral,
+		DarkNeutral:  darkNeutral,
 	}
 
-	return append(base, newColors...)
+	// Generate missing colors
+	nMissingColors := len(rawColors.Colors) - len(newBaseColors)
+	// meanDeltaE00 := averageDeltaE00(deltaE00Mat)
+
+	newBaseColors = append(newBaseColors, harmonicExpand(dominantColor, min(3, nMissingColors))...)
+	nMissingColors -= 3
+	newBaseColors = append(newBaseColors, contrastNeutral(dominantColor, nMissingColors)...)
+
+	copy((*rawColors).Colors[:], newBaseColors)
+
+	return rawColors
 }
 
 func contrastNeutral(dominant *colors.LCHab, n int) []*colors.LCHab {
-	fmt.Println("performing contrast neutral...")
-	newColors := make([]*colors.LCHab, n)
 	if n <= 0 {
-		return newColors
+		return []*colors.LCHab{}
 	}
+
+	newColors := make([]*colors.LCHab, n)
 
 	accentL := dominant.L
 	if accentL > 50 {
-		accentL += 10
-	} else {
-		accentL -= 10
+		accentL += 5
 	}
 
 	accentC := utils.Clamp(dominant.C*1.2, 0, 100)
@@ -227,7 +214,6 @@ func contrastNeutral(dominant *colors.LCHab, n int) []*colors.LCHab {
 }
 
 func harmonicExpand(dominant *colors.LCHab, n int) []*colors.LCHab {
-	fmt.Println("performing harmonic expand...")
 	newColors := make([]*colors.LCHab, n)
 	for i := range n {
 		var hueOffsetSign float32 = 1
