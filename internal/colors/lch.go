@@ -29,6 +29,14 @@ func (c *LCHab) GetTemperature() float64 {
 	return math.Cos(float64(c.H) - 60)
 }
 
+func (c *LCHab) ToHex() string {
+	rgb, err := LCHtoRGB(c)
+	if err != nil {
+		return ""
+	}
+	return rgb.ToHex()
+}
+
 func LCHtoLab(in *LCHab) *Lab {
 	out := &Lab{
 		L: in.L,
