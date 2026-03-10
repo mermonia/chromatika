@@ -21,6 +21,10 @@ func (c *Rgb) String() string {
 	return c.Render(3)
 }
 
+func (c *Rgb) ToHex() string {
+	return fmt.Sprintf("%x%x%x", c.R, c.G, c.B)
+}
+
 func RGBtoNRGB(in *Rgb) *NRgb {
 	out := &NRgb{
 		R: normalizeRGB(in.R),

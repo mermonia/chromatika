@@ -25,5 +25,5 @@ type Palette struct {
 	Color12,
 	Color13,
 	Color14,
-	Color15 colors.LCHab
+	Color15 *colors.LCHab
 }
