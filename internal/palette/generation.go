@@ -57,9 +57,39 @@ func GeneratePalette(imagePath string, darkmode bool) (*Palette, error) {
 	}
 
 	rawColors := generateRawPalette(suitableColors)
-	fmt.Printf("Color Palette:\n%s\n", rawColors)
 
-	return nil, nil
+	if darkmode {
+		return getDarkModePalette(rawColors)
+	}
+	return getLightModePalette(rawColors)
+}
+
+func getDarkModePalette(rawColors *RawColors) (*Palette, error) {
+	derivedColors := [8]*colors.LCHab{}
+	for i, baseCol := range rawColors.Colors {
+		derivedColors[i] = colors.Darker(baseCol)
+	}
+
+	return &Palette{
+		Background:    rawColors.DarkNeutral,
+		Foreground:    rawColors.LightNeutral,
+		BaseColors:    rawColors.Colors,
+		DerivedColors: derivedColors,
+	}, nil
+}
+
+func getLightModePalette(rawColors *RawColors) (*Palette, error) {
+	derivedColors := [8]*colors.LCHab{}
+	for i, baseCol := range rawColors.Colors {
+		derivedColors[i] = colors.Lighter(baseCol)
+	}
+
+	return &Palette{
+		Background:    rawColors.LightNeutral,
+		Foreground:    rawColors.DarkNeutral,
+		BaseColors:    rawColors.Colors,
+		DerivedColors: derivedColors,
+	}, nil
 }
 
 /*

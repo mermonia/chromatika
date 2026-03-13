@@ -17,23 +17,23 @@ func TestCreateFileFromFile(t *testing.T) {
 background = "{{.Background.ToHex}}"
 foreground = "{{.Foreground.ToHex}}"
 
-color0 = "{{.Color0.ToHex}}"
-color1 = "{{.Color1.ToHex}}"
-color2 = "{{.Color2.ToHex}}"
-color3 = "{{.Color3.ToHex}}"
-color4 = "{{.Color4.ToHex}}"
-color5 = "{{.Color5.ToHex}}"
-color6 = "{{.Color6.ToHex}}"
-color7 = "{{.Color7.ToHex}}"
+color0 = "{{(index .BaseColors 0).ToHex}}"
+color1 = "{{(index .BaseColors 1).ToHex}}"
+color2 = "{{(index .BaseColors 2).ToHex}}"
+color3 = "{{(index .BaseColors 3).ToHex}}"
+color4 = "{{(index .BaseColors 4).ToHex}}"
+color5 = "{{(index .BaseColors 5).ToHex}}"
+color6 = "{{(index .BaseColors 6).ToHex}}"
+color7 = "{{(index .BaseColors 7).ToHex}}"
 
-color8 = "{{.Color8.ToHex}}"
-color9 = "{{.Color9.ToHex}}"
-color10 = "{{.Color10.ToHex}}"
-color11 = "{{.Color11.ToHex}}"
-color12 = "{{.Color12.ToHex}}"
-color13 = "{{.Color13.ToHex}}"
-color14 = "{{.Color14.ToHex}}"
-color15 = "{{.Color15.ToHex}}"
+color8 = "{{(index .DerivedColors 0).ToHex}}"
+color9 = "{{(index .DerivedColors 1).ToHex}}"
+color10 = "{{(index .DerivedColors 2).ToHex}}"
+color11 = "{{(index .DerivedColors 3).ToHex}}"
+color12 = "{{(index .DerivedColors 4).ToHex}}"
+color13 = "{{(index .DerivedColors 5).ToHex}}"
+color14 = "{{(index .DerivedColors 6).ToHex}}"
+color15 = "{{(index .DerivedColors 7).ToHex}}"
 	`
 
 	expectedResult := `
@@ -75,24 +75,10 @@ color15 = "937219"
 	}
 
 	pal := &palette.Palette{
-		Background: cols[0],
-		Foreground: cols[1],
-		Color0: cols[2],
-		Color1: cols[3],
-		Color2: cols[4],
-		Color3: cols[5],
-		Color4: cols[6],
-		Color5: cols[7],
-		Color6: cols[8],
-		Color7: cols[9],
-		Color8: cols[10],
-		Color9: cols[11],
-		Color10: cols[12],
-		Color11: cols[13],
-		Color12: cols[14],
-		Color13: cols[15],
-		Color14: cols[16],
-		Color15: cols[17],
+		Background:    cols[0],
+		Foreground:    cols[1],
+		BaseColors:    [8]*colors.LCHab(cols[2:10]),
+		DerivedColors: [8]*colors.LCHab(cols[10:]),
 	}
 
 	tempDir := t.TempDir()

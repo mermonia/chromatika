@@ -7,27 +7,13 @@ import (
 type Palette struct {
 	// Special colors
 	Background,
-	Foreground,
+	Foreground *colors.LCHab
 
 	// Base colors
-	Color0,
-	Color1,
-	Color2,
-	Color3,
-	Color4,
-	Color5,
-	Color6,
-	Color7,
+	BaseColors [8]*colors.LCHab
 
 	// Derived colors, variants of the 0-7 base colors
-	Color8,
-	Color9,
-	Color10,
-	Color11,
-	Color12,
-	Color13,
-	Color14,
-	Color15 *colors.LCHab
+	DerivedColors [8]*colors.LCHab
 }
 
 type RawColors struct {

@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/mermonia/chromatika/internal/clustering"
-	"github.com/mermonia/chromatika/internal/evaluation"
-	"github.com/mermonia/chromatika/internal/extraction"
+	"github.com/mermonia/chromatika/internal/palette"
 	"github.com/urfave/cli/v3"
 )
 
@@ -92,30 +90,12 @@ var PaletteImageCommand cli.Command = cli.Command{
 }
 
 func ExecutePaletteImage(cmdCfg *PaletteImageCommandOptions) error {
-	dominantColors, partMatrix, err := extraction.GetDominantColors(
-		cmdCfg.ImagePath,
-		cmdCfg.ScaleWidth,
-		cmdCfg.QuantInterval,
-		clustering.FCMParameters{
-			M: cmdCfg.Fuzziness,
-			E: cmdCfg.Threshold,
-			B: cmdCfg.MaxIter,
-			K: cmdCfg.Clusters,
-		},
-	)
-
+	pal, err := palette.GeneratePalette(cmdCfg.ImagePath, true)
 	if err != nil {
-		return fmt.Errorf("could not get dominant colors: %w", err)
+		return fmt.Errorf("could not generate palette: %w", err)
 	}
 
-	primaryColor := evaluation.ChoosePrimaryColor(dominantColors, partMatrix)
-	backgroundColor := evaluation.ChooseBackgroundColor(dominantColors, partMatrix)
-
-	primaryColorBlock, _ := primaryColor.Render(3)
-	backgroundColorBlock, _ := backgroundColor.Render(3)
-
-	fmt.Printf("Primary color: %s\n", primaryColorBlock)
-	fmt.Printf("Background color: %s\n", backgroundColorBlock)
+	fmt.Println(pal)
 
 	return nil
 }

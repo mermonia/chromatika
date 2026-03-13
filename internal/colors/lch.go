@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/mermonia/chromatika/internal/utils"
 )
 
 func (c *LCHab) Render(width int) (string, error) {
@@ -37,6 +38,22 @@ func (c *LCHab) ToHex() string {
 	return rgb.ToHex()
 }
 
+func Lighter(in *LCHab) *LCHab {
+	return &LCHab{
+		L: RegularizeLuminosity(in.L * 1.09),
+		C: in.C,
+		H: RegularizeHue(in.H + 2),
+	}
+}
+
+func Darker(in *LCHab) *LCHab {
+	return &LCHab{
+		L: RegularizeLuminosity(in.L * 0.94),
+		C: RegularizeChroma(in.C + 8),
+		H: RegularizeHue(in.H + 2),
+	}
+}
+
 func LCHtoLab(in *LCHab) *Lab {
 	out := &Lab{
 		L: in.L,
@@ -60,4 +77,12 @@ func RegularizeHue(h float32) float32 {
 		return h - 360
 	}
 	return h
+}
+
+func RegularizeLuminosity(l float32) float32 {
+	return utils.Clamp(l, 0, 100)
+}
+
+func RegularizeChroma(c float32) float32 {
+	return utils.Clamp(c, 0, 100)
 }
