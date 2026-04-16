@@ -13,7 +13,6 @@ import (
 type PaletteCommandOptions struct {
 	ImagePath     string
 	Format        string
-	Clusters      int
 	Fuzziness     float64
 	QuantInterval int
 	MaxIter       int
@@ -99,7 +98,6 @@ var PaletteCommand cli.Command = cli.Command{
 	Action: func(ctx context.Context, c *cli.Command) error {
 		cmdCfg := &PaletteCommandOptions{
 			ImagePath:     filepath.Clean(c.StringArg("imagePath")),
-			Clusters:      c.Int("clusters"),
 			Fuzziness:     c.Float64("fuzziness"),
 			QuantInterval: c.Int("quantInterval"),
 			MaxIter:       c.Int("maxIter"),
