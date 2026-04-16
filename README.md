@@ -6,7 +6,7 @@ Chromatika is a lightweight image color extraction tool and palette generator wr
 
 ## Features
 
-- Extract the dominant colors of an image via Fuzzy C-Means clustering over a quantized L*a*b* color space.
+- Extract the dominant colors of an image via Fuzzy C-Means clustering over a quantized Lab color space.
 - Generate harmonious palettes from an image's dominant colors.
 - Export generated palettes with different formats.
 
@@ -76,17 +76,17 @@ algorithm that assigns, to each sample, a degree of membership to each one of th
 Running the algorithm with every single pixel of the image as a sample would be completely unfeasible though,
 which is why chromatika uses color quantization to generate an admissible amount of samples:
 
-- First, the source image's pixels are all converted to the (relatively) perceptually uniform color L*a*b* space 
+- First, the source image's pixels are all converted to the (relatively) perceptually uniform color Lab space 
 (since performing both quantization and clustering on a non-uniform space would produce poor results).
-- Then, every pixel of the image is "assigned" to one single section of the quantized L*a*b* space, and sections
+- Then, every pixel of the image is "assigned" to one single section of the quantized Lab space, and sections
 which have no pixels assigned to them are discarded.
 - After that, FCM is performed on the remaining color sections, each of them having a different weight (linearly 
 depending on the amount of pixels assigned to them).
 
-> Note: Conversion is performed from sRGB space to L*a*b* space, so images in a color space different from sRGB will
+> Note: Conversion is performed from sRGB space to Lab space, so images in a color space different from sRGB will
 not be properly analyzed. If this is a concern, consider converting them to sRGB space before analysis.
 
-The centroids of each resulting cluster are sections of the L*a*b* color space. The representative color
+The centroids of each resulting cluster are sections of the Lab color space. The representative color
 for each bin (section) is its center.
 
 ## Output formats
