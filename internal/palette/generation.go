@@ -17,14 +17,14 @@ var defaultFuzziness float64 = 2.0
 var defaultThreshold float64 = 0.001
 var defaultMaxIterations int = 100
 
-const MIN_DELTAE00 = 20
-
-const SEARCH_ITERATIONS = 1
+const N_INITIAL_CLUSTERS = 16
 const N_CLUSTERS_STEP = 0
+const SEARCH_ITERATIONS = 1
 
 const N_BASE_COLORS = 8
+const MIN_DELTAE00 = 20
 
-func GeneratePalette(imagePath string, darkmode bool) (*Palette, error) {
+func GeneratePalette(cfg *GenerationConfig) (*Palette, error) {
 	/*
 		Extract dominant colors multiple times, increasing the number of colors extracted
 		each iteration.
@@ -32,14 +32,13 @@ func GeneratePalette(imagePath string, darkmode bool) (*Palette, error) {
 	var suitableColors []*colors.LCHab
 	for i := range SEARCH_ITERATIONS {
 		labCols, _, err := extraction.GetDominantColors(
-			imagePath,
-			defaultScaleWidth,
-			defaultQuantInterval,
-			clustering.FCMParameters{
-				M: defaultFuzziness,
-				E: defaultThreshold,
-				B: defaultMaxIterations,
-				K: 16 + i*N_CLUSTERS_STEP,
+			cfg.ImagePath,
+			cfg.ScaleWidth,
+			cfg.QuantInterval, clustering.FCMParameters{
+				M: cfg.Fuzziness,
+				E: cfg.Fuzziness,
+				B: cfg.MaxIter,
+				K: N_INITIAL_CLUSTERS + i*N_CLUSTERS_STEP,
 			},
 		)
 
@@ -58,7 +57,7 @@ func GeneratePalette(imagePath string, darkmode bool) (*Palette, error) {
 
 	rawColors := generateRawPalette(suitableColors)
 
-	if darkmode {
+	if cfg.DarkMode {
 		return getDarkModePalette(rawColors)
 	}
 	return getLightModePalette(rawColors)

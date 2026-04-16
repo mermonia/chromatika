@@ -18,23 +18,28 @@ const (
 
 type AnalyzeCommandOptions struct {
 	ColorString string
-	ColType	ColorType
+	ColType     ColorType
 }
 
 var analyzeCommandDescription string = `
-description goes here
+Prints the LCH(ab) color equivalent to the given sRGB color in hex
+notation (#RRGGBB).
+
+While this command is meant to be used as a debugging/testing tool for
+colors generated with chromatiak, it can be used to analyze any RGB color 
+in a more expressive color space.
 `
 
 var AnalyzeCommand cli.Command = cli.Command{
-	Name: "analyze",
-	Aliases: []string{"a"},
-	Usage: "analyze the given color",
-	ArgsUsage: "<color>",
-	Description: analyzeCommandDescription,
+	Name:                  "analyze",
+	Aliases:               []string{"a"},
+	Usage:                 "analyze the given color",
+	ArgsUsage:             "<color>",
+	Description:           analyzeCommandDescription,
 	EnableShellCompletion: true,
 	Arguments: []cli.Argument{
 		&cli.StringArg{
-			Name: "color",
+			Name:  "color",
 			Value: "",
 		},
 	},
@@ -43,7 +48,7 @@ var AnalyzeCommand cli.Command = cli.Command{
 
 		cmdCfg := &AnalyzeCommandOptions{
 			ColorString: c.StringArg("color"),
-			ColType: colorFormat,
+			ColType:     colorFormat,
 		}
 
 		return ExecuteAnalyze(cmdCfg)

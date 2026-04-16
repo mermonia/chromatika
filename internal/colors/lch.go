@@ -26,6 +26,16 @@ func (c *LCHab) String() string {
 	return block
 }
 
+func (c LCHab) MarshalText() ([]byte, error) {
+	rgb, err := LCHtoRGB(&c)
+	if err != nil {
+		return nil, fmt.Errorf("could not convert lch to rgb: %w", err)
+	}
+
+	var res []byte
+	return fmt.Appendf(res, "%02x%02x%02x", rgb.R, rgb.G, rgb.B), nil
+}
+
 func (c *LCHab) GetTemperature() float64 {
 	return math.Cos(float64(c.H) - 60)
 }

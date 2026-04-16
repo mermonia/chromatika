@@ -8,6 +8,7 @@ import (
 	"github.com/urfave/cli/v3"
 
 	"github.com/mermonia/chromatika/internal/clustering"
+	"github.com/mermonia/chromatika/internal/colors"
 	"github.com/mermonia/chromatika/internal/extraction"
 )
 
@@ -22,7 +23,15 @@ type ExtractCommandOptions struct {
 }
 
 var extractCommandDescription string = `
-description goes here
+Extracts the dominant colors of the image at the given path and
+outputs their sRGB hex representations.
+
+The dominant colors are extracted via FCM, and most of its parameters
+can be tuned with optional flags.
+
+The FCM is performed on a quantized set of Lab colors. The quantization
+interval for each considered section of the color space can also be
+tuned, although it might affect performance/quality if too high/low.
 `
 
 var ExtractCommand cli.Command = cli.Command{
@@ -109,11 +118,9 @@ func ExecuteExtract(cmdCfg *ExtractCommandOptions) error {
 	}
 
 	for _, color := range dominantColors {
-		render, err := color.Render(3)
-		if err != nil {
-			return fmt.Errorf("could not render color: %w", err)
+		if rgbColor, err := colors.LabToRGB(color); err == nil {
+			fmt.Printf("%x%x%x\n", rgbColor.R, rgbColor.G, rgbColor.B)
 		}
-		fmt.Print(render)
 	}
 	fmt.Println()
 
