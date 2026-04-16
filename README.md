@@ -68,6 +68,8 @@ amount of generated clusters/dominant colors:
 chromatika extract path-to-your-image.png -k 5
 ```
 
+--- 
+
 ## Algorithm
 
 The algorithm used to extract dominant colors from images is FCM (Fuzzy C-Means), a well known clustering
@@ -89,11 +91,15 @@ not be properly analyzed. If this is a concern, consider converting them to sRGB
 The centroids of each resulting cluster are sections of the Lab color space. The representative color
 for each bin (section) is its center.
 
+---
+
 ## Output formats
 
 For now, there are only 2 available output formats for the **palette** command (ascii and toml),
 while the **extract** command always outputs a list of hex colors. In the near future, both commands will
 include ascii, toml, hex and json formats.
+
+---
 
 ## Licence
 
