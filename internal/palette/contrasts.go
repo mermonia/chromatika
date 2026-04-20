@@ -7,6 +7,20 @@ import (
 	"github.com/mermonia/chromatika/internal/utils"
 )
 
+
+func wcag(a, b *colors.LCHab) (float32, error) {
+	labA := colors.LCHtoLab(a)
+	labB := colors.LCHtoLab(b)
+
+	xyzA := colors.LabToXyz(labA)
+	xyzB := colors.LabToXyz(labB)
+
+	l1 := max(xyzA.Y, xyzB.Y)
+	l2 := min(xyzA.Y, xyzB.Y)
+
+	return (l1 + 0.05) / (l2 + 0.05), nil
+}
+
 // xY: Y value for color x
 func deltaE00(a, b *colors.LCHab) float64 {
 	labA := colors.LCHtoLab(a)

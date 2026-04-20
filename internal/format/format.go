@@ -29,11 +29,15 @@ func (*ASCIIPaletteFormatter) Format(pal *palette.Palette) string {
 	res += fmt.Sprintf("Background: %s\n", pal.Background)
 	res += fmt.Sprintf("Foreground: %s\n", pal.Foreground)
 
-	for i, color := range pal.BaseColors {
+	res += fmt.Sprintf("Primary:    %s\n", pal.Primary)
+	res += fmt.Sprintf("Secondary:  %s\n", pal.Secondary)
+	res += fmt.Sprintf("Accent:     %s\n", pal.Accent)
+
+	for i, color := range pal.ANSIBase {
 		res += fmt.Sprintf("Color[%d]: %s\n", i, color)
 	}
 
-	for i, color := range pal.DerivedColors {
+	for i, color := range pal.ANSILighter {
 		res += fmt.Sprintf("Derived Color[%d]: %s\n", i, color)
 	}
 

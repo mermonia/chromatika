@@ -54,7 +54,7 @@ func RGBtoXYZ(in *Rgb) (*Xyz, error) {
 	workingMat := utils.NewMatrix(workingMatData)
 
 	nrgb := RGBtoNRGB(in)
-	corrected := gammaCorrectNRGB(nrgb)
+	corrected := GammaRemoveNRGB(nrgb)
 
 	colorMat := corrected.ToMatrix()
 
@@ -104,11 +104,11 @@ func labTransform(t float32) float32 {
 	return t*7.787 + 16.0/116.0
 }
 
-func gammaCorrectNRGB(in *NRgb) *NRgb {
+func GammaRemoveNRGB(in *NRgb) *NRgb {
 	out := &NRgb{
-		R: gammaCorrect(in.R),
-		G: gammaCorrect(in.G),
-		B: gammaCorrect(in.B),
+		R: gammaRemove(in.R),
+		G: gammaRemove(in.G),
+		B: gammaRemove(in.B),
 	}
 
 	return out
@@ -128,7 +128,7 @@ func scaleNRGB(value float32) uint8 {
 	return uint8(value * 255.0)
 }
 
-func gammaCorrect(value float32) float32 {
+func gammaRemove(value float32) float32 {
 	if value <= 0.04045 {
 		return value / 12.92
 	}

@@ -38,6 +38,14 @@ func (c *Lab) GetHue() float64 {
 	return hue
 }
 
+func LabMix(a, b *Lab, bias float32) *Lab {
+	return &Lab{
+		L: a.L*bias + b.L*(1-bias),
+		A: a.A*bias + b.A*(1-bias),
+		B: a.B*bias + b.B*(1-bias),
+	}
+}
+
 func LabToLCH(in *Lab) *LCHab {
 	out := &LCHab{
 		L: in.L,

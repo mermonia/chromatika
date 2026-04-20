@@ -64,6 +64,13 @@ func Darker(in *LCHab) *LCHab {
 	}
 }
 
+func LCHMix(a, b *LCHab, bias float32) *LCHab {
+	aLab := LCHtoLab(a)
+	bLab := LCHtoLab(b)
+	mixLab := LabMix(aLab, bLab, bias)
+	return LabToLCH(mixLab)
+}
+
 func LCHtoLab(in *LCHab) *Lab {
 	out := &Lab{
 		L: in.L,
@@ -94,5 +101,5 @@ func RegularizeLuminosity(l float32) float32 {
 }
 
 func RegularizeChroma(c float32) float32 {
-	return utils.Clamp(c, 0, 100)
+	return utils.Clamp(c, 0, 150)
 }

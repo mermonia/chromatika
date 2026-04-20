@@ -7,13 +7,14 @@ import (
 type Palette struct {
 	// Special colors
 	Background,
-	Foreground *colors.LCHab
+	Foreground,
 
-	// Base colors
-	BaseColors [8]*colors.LCHab
+	Primary,
+	Secondary,
+	Accent *colors.LCHab
 
-	// Derived colors, variants of the 0-7 base colors
-	DerivedColors [8]*colors.LCHab
+	ANSIBase,
+	ANSILighter [8]*colors.LCHab
 }
 
 type RawColors struct {
@@ -21,13 +22,5 @@ type RawColors struct {
 	DarkNeutral,
 	LightNeutral *colors.LCHab
 
-	Colors [8]*colors.LCHab
-}
-
-func (rc *RawColors) String() string {
-	res := rc.DarkNeutral.String() + rc.LightNeutral.String() + " "
-	for i := range rc.Colors {
-		res += rc.Colors[i].String()
-	}
-	return res
+	Colors []*colors.LCHab
 }
