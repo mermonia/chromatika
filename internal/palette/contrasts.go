@@ -7,7 +7,7 @@ import (
 	"github.com/mermonia/chromatika/internal/utils"
 )
 
-func wcag(a, b *colors.LCHab) (float64, error) {
+func wcag(a, b colors.LCHab) (float64, error) {
 	labA := colors.LCHtoLab(a)
 	labB := colors.LCHtoLab(b)
 
@@ -21,7 +21,7 @@ func wcag(a, b *colors.LCHab) (float64, error) {
 }
 
 // xY: Y value for color x
-func deltaE00(a, b *colors.LCHab) float64 {
+func deltaE00(a, b colors.LCHab) float64 {
 	labA := colors.LCHtoLab(a)
 	labB := colors.LCHtoLab(b)
 
@@ -41,13 +41,13 @@ func deltaE00(a, b *colors.LCHab) float64 {
 	aAprime := aA * (1 + G)
 	bAprime := bA * (1 + G)
 
-	labAprime := &colors.Lab{
+	labAprime := colors.Lab{
 		L: a.L,
 		A: aAprime,
 		B: labA.B,
 	}
 
-	labBprime := &colors.Lab{
+	labBprime := colors.Lab{
 		L: b.L,
 		A: bAprime,
 		B: labB.B,

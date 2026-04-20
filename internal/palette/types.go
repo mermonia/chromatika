@@ -11,16 +11,16 @@ type Palette struct {
 
 	Primary,
 	Secondary,
-	Accent *colors.LCHab
+	Accent colors.LCHab
 
 	ANSIBase,
-	ANSILighter [8]*colors.LCHab
+	ANSILighter [8]colors.LCHab
 }
 
 type RawColors struct {
 	// Neutral Colors
 	DarkNeutral,
-	LightNeutral *colors.LCHab
+	LightNeutral colors.LCHab
 
-	Colors []*colors.LCHab
+	Colors []colors.LCHab
 }

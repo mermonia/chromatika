@@ -4,7 +4,7 @@ import (
 	"math"
 )
 
-func DistanceLab(a, b *Lab) float64 {
+func DistanceLab(a, b Lab) float64 {
 	deltaL := b.L - a.L
 	deltaA := b.A - a.A
 	deltaB := b.B - a.B
@@ -12,7 +12,7 @@ func DistanceLab(a, b *Lab) float64 {
 	return math.Sqrt(deltaL*deltaL + deltaA*deltaA + deltaB*deltaB)
 }
 
-func DistanceMatrix(colors []*Lab) [][]float64 {
+func DistanceMatrix(colors []Lab) [][]float64 {
 	n := len(colors)
 
 	res := make([][]float64, n)
@@ -33,7 +33,7 @@ func DistanceMatrix(colors []*Lab) [][]float64 {
 	return res
 }
 
-func (a *Lab) Equals(b *Lab) bool {
+func (a Lab) Equals(b Lab) bool {
 	if a.L != b.L || a.A != b.A || a.B != b.B {
 		return false
 	}

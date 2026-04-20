@@ -8,13 +8,13 @@ import (
 )
 
 func TestDeltaE00(t *testing.T) {
-	a := &colors.LCHab{
+	a := colors.LCHab{
 		L: 7.8757,
 		C: 19.412,
 		H: 292.71,
 	}
 
-	b := &colors.LCHab{
+	b := colors.LCHab{
 		L: 4.481,
 		C: 12.9203,
 		H: 295.781,

@@ -9,10 +9,10 @@ import (
 	"github.com/mermonia/chromatika/internal/colors"
 )
 
-func GetRawLabArray(pixels []color.Color) ([]*colors.Lab, error) {
+func GetRawLabArray(pixels []color.Color) ([]colors.Lab, error) {
 	workers := runtime.NumCPU()
 
-	res := make([]*colors.Lab, len(pixels))
+	res := make([]colors.Lab, len(pixels))
 
 	var wg sync.WaitGroup
 	wg.Add(workers)

@@ -12,7 +12,7 @@ type FCMParameters struct {
 	B, K int
 }
 
-func FCM(cols []*colors.Lab, np []int, params FCMParameters) ([]*colors.Lab, [][]float64, error) {
+func FCM(cols []colors.Lab, np []int, params FCMParameters) ([]colors.Lab, [][]float64, error) {
 	// Pre-calculation of color distances
 	distanceMat := colors.DistanceMatrix(cols)
 
@@ -22,7 +22,7 @@ func FCM(cols []*colors.Lab, np []int, params FCMParameters) ([]*colors.Lab, [][
 		return nil, nil, fmt.Errorf("could not calculate initial cluster centers: %w", err)
 	}
 
-	centers := make([]*colors.Lab, params.K)
+	centers := make([]colors.Lab, params.K)
 	for i, cidx := range initialCenters {
 		centers[i] = cols[cidx]
 	}
@@ -47,7 +47,7 @@ func FCM(cols []*colors.Lab, np []int, params FCMParameters) ([]*colors.Lab, [][
 	return centers, partitionMat, nil
 }
 
-func calculateDifference(a, b []*colors.Lab) float64 {
+func calculateDifference(a, b []colors.Lab) float64 {
 	var maxDiff float64 = 0.0
 
 	for i := range len(a) {
@@ -60,7 +60,7 @@ func calculateDifference(a, b []*colors.Lab) float64 {
 	return maxDiff
 }
 
-func calculatePartitionMatrix(cols []*colors.Lab, centers []*colors.Lab, m float64) [][]float64 {
+func calculatePartitionMatrix(cols []colors.Lab, centers []colors.Lab, m float64) [][]float64 {
 	ncols := len(cols)
 	k := len(centers)
 
@@ -107,9 +107,9 @@ func calculatePartitionMatrix(cols []*colors.Lab, centers []*colors.Lab, m float
 	return U
 }
 
-func calculateCenters(cols []*colors.Lab, U [][]float64, np []int, m float64) []*colors.Lab {
+func calculateCenters(cols []colors.Lab, U [][]float64, np []int, m float64) []colors.Lab {
 	k := len(U[0])
-	centers := make([]*colors.Lab, k)
+	centers := make([]colors.Lab, k)
 
 	// for each cluster, find its center
 	for c := range k {
@@ -124,7 +124,7 @@ func calculateCenters(cols []*colors.Lab, U [][]float64, np []int, m float64) []
 			sumB += color.B * weight
 		}
 
-		centers[c] = &colors.Lab{
+		centers[c] = colors.Lab{
 			L: sumL / sumWeights,
 			A: sumA / sumWeights,
 			B: sumB / sumWeights,

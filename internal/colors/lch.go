@@ -8,7 +8,7 @@ import (
 	"github.com/mermonia/chromatika/internal/utils"
 )
 
-func (c *LCHab) Render(width int) (string, error) {
+func (c LCHab) Render(width int) (string, error) {
 	rgb, err := LCHtoRGB(c)
 	if err != nil {
 		return "", fmt.Errorf("could not convert from lab to rgb: %w", err)
@@ -21,13 +21,13 @@ func (c *LCHab) Render(width int) (string, error) {
 	return style.Render(" "), nil
 }
 
-func (c *LCHab) String() string {
+func (c LCHab) String() string {
 	block, _ := c.Render(3)
 	return block
 }
 
 func (c LCHab) MarshalText() ([]byte, error) {
-	rgb, err := LCHtoRGB(&c)
+	rgb, err := LCHtoRGB(c)
 	if err != nil {
 		return nil, fmt.Errorf("could not convert lch to rgb: %w", err)
 	}
@@ -36,11 +36,11 @@ func (c LCHab) MarshalText() ([]byte, error) {
 	return fmt.Appendf(res, "%02x%02x%02x", rgb.R, rgb.G, rgb.B), nil
 }
 
-func (c *LCHab) GetTemperature() float64 {
+func (c LCHab) GetTemperature() float64 {
 	return math.Cos(c.H - 60)
 }
 
-func (c *LCHab) ToHex() string {
+func (c LCHab) ToHex() string {
 	rgb, err := LCHtoRGB(c)
 	if err != nil {
 		return ""
@@ -48,31 +48,31 @@ func (c *LCHab) ToHex() string {
 	return rgb.ToHex()
 }
 
-func Lighter(in *LCHab) *LCHab {
-	return &LCHab{
+func Lighter(in LCHab) LCHab {
+	return LCHab{
 		L: RegularizeLuminosity(in.L * 1.09),
 		C: in.C,
 		H: RegularizeHue(in.H + 2),
 	}
 }
 
-func Darker(in *LCHab) *LCHab {
-	return &LCHab{
+func Darker(in LCHab) LCHab {
+	return LCHab{
 		L: RegularizeLuminosity(in.L * 0.94),
 		C: RegularizeChroma(in.C + 8),
 		H: RegularizeHue(in.H + 2),
 	}
 }
 
-func LCHMix(a, b *LCHab, bias float64) *LCHab {
+func LCHMix(a, b LCHab, bias float64) LCHab {
 	aLab := LCHtoLab(a)
 	bLab := LCHtoLab(b)
 	mixLab := LabMix(aLab, bLab, bias)
 	return LabToLCH(mixLab)
 }
 
-func LCHtoLab(in *LCHab) *Lab {
-	out := &Lab{
+func LCHtoLab(in LCHab) Lab {
+	out := Lab{
 		L: in.L,
 		A: in.C * math.Cos(in.H*math.Pi/180),
 		B: in.C * math.Sin(in.H*math.Pi/180),
@@ -81,7 +81,7 @@ func LCHtoLab(in *LCHab) *Lab {
 	return out
 }
 
-func LCHtoRGB(in *LCHab) (*Rgb, error) {
+func LCHtoRGB(in LCHab) (Rgb, error) {
 	lab := LCHtoLab(in)
 	return LabToRGB(lab)
 }

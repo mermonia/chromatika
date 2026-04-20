@@ -24,7 +24,7 @@ type LCHab struct {
 	L, C, H float64
 }
 
-func (col *NRgb) ToMatrix() *utils.Matrix {
+func (col NRgb) ToMatrix() *utils.Matrix {
 	data := [][]float64{
 		{col.R},
 		{col.G},
@@ -34,7 +34,7 @@ func (col *NRgb) ToMatrix() *utils.Matrix {
 	return utils.NewMatrix(data)
 }
 
-func (col *Xyz) ToMatrix() *utils.Matrix {
+func (col Xyz) ToMatrix() *utils.Matrix {
 	data := [][]float64{
 		{col.X},
 		{col.Y},

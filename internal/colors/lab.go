@@ -8,7 +8,7 @@ import (
 	"github.com/mermonia/chromatika/internal/utils"
 )
 
-func (c *Lab) Render(width int) (string, error) {
+func (c Lab) Render(width int) (string, error) {
 	rgb, err := LabToRGB(c)
 	if err != nil {
 		return "", fmt.Errorf("could not convert from lab to rgb: %w", err)
@@ -21,16 +21,16 @@ func (c *Lab) Render(width int) (string, error) {
 	return style.Render(" "), nil
 }
 
-func (c *Lab) String() string {
+func (c Lab) String() string {
 	block, _ := c.Render(3)
 	return block
 }
 
-func (c *Lab) GetChroma() float64 {
+func (c Lab) GetChroma() float64 {
 	return math.Sqrt(c.A*c.A + c.B*c.B)
 }
 
-func (c *Lab) GetHue() float64 {
+func (c Lab) GetHue() float64 {
 	hue := math.Atan2(c.B, c.A) * 180 / math.Pi
 	if hue < 0 {
 		hue += 360
@@ -38,16 +38,16 @@ func (c *Lab) GetHue() float64 {
 	return hue
 }
 
-func LabMix(a, b *Lab, bias float64) *Lab {
-	return &Lab{
+func LabMix(a, b Lab, bias float64) Lab {
+	return Lab{
 		L: a.L*bias + b.L*(1-bias),
 		A: a.A*bias + b.A*(1-bias),
 		B: a.B*bias + b.B*(1-bias),
 	}
 }
 
-func LabToLCH(in *Lab) *LCHab {
-	out := &LCHab{
+func LabToLCH(in Lab) LCHab {
+	out := LCHab{
 		L: in.L,
 		C: in.GetChroma(),
 		H: in.GetHue(),
@@ -56,7 +56,7 @@ func LabToLCH(in *Lab) *LCHab {
 	return out
 }
 
-func LabToRGB(in *Lab) (*Rgb, error) {
+func LabToRGB(in Lab) (Rgb, error) {
 	workingMatData := [][]float64{
 		{3.2404542, -1.5371385, -0.4985314},
 		{-0.9692660, 1.8760108, 0.0415560},
@@ -70,10 +70,10 @@ func LabToRGB(in *Lab) (*Rgb, error) {
 	var convertedMat utils.Matrix
 	err := convertedMat.Mul(workingMat, colorMat)
 	if err != nil {
-		return nil, fmt.Errorf("could not multiply working matrix and xyz color: %w", err)
+		return Rgb{}, fmt.Errorf("could not multiply working matrix and xyz color: %w", err)
 	}
 
-	linearNRgb := &NRgb{
+	linearNRgb := NRgb{
 		R: convertedMat.At(0, 0),
 		G: convertedMat.At(1, 0),
 		B: convertedMat.At(2, 0),
@@ -85,7 +85,7 @@ func LabToRGB(in *Lab) (*Rgb, error) {
 	return rgb, nil
 }
 
-func LabToXyz(in *Lab) *Xyz {
+func LabToXyz(in Lab) Xyz {
 	// Reference white D65
 	var wX, wY, wZ float64
 	wX, wY, wZ = 0.95047003, 1.0000001, 1.08883
@@ -117,7 +117,7 @@ func LabToXyz(in *Lab) *Xyz {
 		z = (116*fZ - 16) / k
 	}
 
-	xyz := &Xyz{
+	xyz := Xyz{
 		X: x * wX,
 		Y: y * wY,
 		Z: z * wZ,
@@ -126,8 +126,8 @@ func LabToXyz(in *Lab) *Xyz {
 	return xyz
 }
 
-func compandedNRGB(in *NRgb) *NRgb {
-	out := &NRgb{
+func compandedNRGB(in NRgb) NRgb {
+	out := NRgb{
 		R: compand(in.R),
 		G: compand(in.G),
 		B: compand(in.B),

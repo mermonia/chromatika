@@ -5,7 +5,7 @@ import (
 	"github.com/mermonia/chromatika/internal/utils"
 )
 
-func Quantize(q int, cols []*colors.Lab) ([]*colors.Lab, []int) {
+func Quantize(q int, cols []colors.Lab) ([]colors.Lab, []int) {
 	colorArray := generateQuantizedColorArray(q)
 	naiveNP := make([]int, len(colorArray))
 
@@ -13,7 +13,7 @@ func Quantize(q int, cols []*colors.Lab) ([]*colors.Lab, []int) {
 		naiveNP[getColorIndex(q, color)]++
 	}
 
-	filteredColors := make([]*colors.Lab, 0, len(colorArray))
+	filteredColors := make([]colors.Lab, 0, len(colorArray))
 	filteredNP := make([]int, 0, len(naiveNP))
 
 	for i, color := range colorArray {
@@ -26,18 +26,18 @@ func Quantize(q int, cols []*colors.Lab) ([]*colors.Lab, []int) {
 	return filteredColors, filteredNP
 }
 
-func generateQuantizedColorArray(q int) []*colors.Lab {
+func generateQuantizedColorArray(q int) []colors.Lab {
 	levelsL := 100 / q
 	levelsA := 240 / q
 	levelsB := 240 / q
 
-	cols := make([]*colors.Lab, levelsL*levelsA*levelsB)
+	cols := make([]colors.Lab, levelsL*levelsA*levelsB)
 
 	for l := range levelsL {
 		for a := range levelsA {
 			for b := range levelsB {
 				// The center of the quantization bin is the representative color
-				cols[l*levelsA*levelsB+a*levelsB+b] = &colors.Lab{
+				cols[l*levelsA*levelsB+a*levelsB+b] = colors.Lab{
 					L: float64(l*q) + float64(q)/2.0,
 					A: float64(a*q-120.0) + float64(q)/2.0,
 					B: float64(b*q-120.0) + float64(q)/2.0,
@@ -49,7 +49,7 @@ func generateQuantizedColorArray(q int) []*colors.Lab {
 	return cols
 }
 
-func getColorIndex(q int, color *colors.Lab) int {
+func getColorIndex(q int, color colors.Lab) int {
 	levelsA := 240 / q
 	levelsB := 240 / q
 

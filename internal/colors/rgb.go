@@ -8,7 +8,7 @@ import (
 	"github.com/mermonia/chromatika/internal/utils"
 )
 
-func (c *Rgb) Render(width int) string {
+func (c Rgb) Render(width int) string {
 	style := lipgloss.NewStyle().
 		Background(lipgloss.Color(
 			fmt.Sprintf("#%02x%02x%02x", c.R, c.G, c.B),
@@ -17,16 +17,16 @@ func (c *Rgb) Render(width int) string {
 	return style.Render(" ")
 }
 
-func (c *Rgb) String() string {
+func (c Rgb) String() string {
 	return c.Render(3)
 }
 
-func (c *Rgb) ToHex() string {
+func (c Rgb) ToHex() string {
 	return fmt.Sprintf("%x%x%x", c.R, c.G, c.B)
 }
 
-func RGBtoNRGB(in *Rgb) *NRgb {
-	out := &NRgb{
+func RGBtoNRGB(in Rgb) NRgb {
+	out := NRgb{
 		R: normalizeRGB(in.R),
 		G: normalizeRGB(in.G),
 		B: normalizeRGB(in.B),
@@ -35,8 +35,8 @@ func RGBtoNRGB(in *Rgb) *NRgb {
 	return out
 }
 
-func NRGBtoRGB(in *NRgb) *Rgb {
-	out := &Rgb{
+func NRGBtoRGB(in NRgb) Rgb {
+	out := Rgb{
 		R: scaleNRGB(in.R),
 		G: scaleNRGB(in.G),
 		B: scaleNRGB(in.B),
@@ -45,7 +45,7 @@ func NRGBtoRGB(in *NRgb) *Rgb {
 	return out
 }
 
-func RGBtoXYZ(in *Rgb) (*Xyz, error) {
+func RGBtoXYZ(in Rgb) (Xyz, error) {
 	workingMatData := [][]float64{
 		{0.4124564, 0.3575761, 0.1804375},
 		{0.2126729, 0.7151522, 0.0721750},
@@ -61,10 +61,10 @@ func RGBtoXYZ(in *Rgb) (*Xyz, error) {
 	var convertedMat utils.Matrix
 	err := convertedMat.Mul(workingMat, colorMat)
 	if err != nil {
-		return nil, fmt.Errorf("could not multiply working matrix and nrgb color: %w", err)
+		return Xyz{}, fmt.Errorf("could not multiply working matrix and nrgb color: %w", err)
 	}
 
-	xyz := &Xyz{
+	xyz := Xyz{
 		X: convertedMat.At(0, 0),
 		Y: convertedMat.At(1, 0),
 		Z: convertedMat.At(2, 0),
@@ -73,10 +73,10 @@ func RGBtoXYZ(in *Rgb) (*Xyz, error) {
 	return xyz, nil
 }
 
-func RGBtoLab(in *Rgb) (*Lab, error) {
+func RGBtoLab(in Rgb) (Lab, error) {
 	xyz, err := RGBtoXYZ(in)
 	if err != nil {
-		return nil, fmt.Errorf("could not convert RGB to Xyz")
+		return Lab{}, fmt.Errorf("could not convert RGB to Xyz")
 	}
 
 	// reference white D65
@@ -87,7 +87,7 @@ func RGBtoLab(in *Rgb) (*Lab, error) {
 	yTrans := labTransform(xyz.Y / wY)
 	zTrans := labTransform(xyz.Z / wZ)
 
-	lab := &Lab{
+	lab := Lab{
 		L: 116*yTrans - 16,
 		A: 500 * (xTrans - yTrans),
 		B: 200 * (yTrans - zTrans),
@@ -104,8 +104,8 @@ func labTransform(t float64) float64 {
 	return t*7.787 + 16.0/116.0
 }
 
-func GammaRemoveNRGB(in *NRgb) *NRgb {
-	out := &NRgb{
+func GammaRemoveNRGB(in NRgb) NRgb {
+	out := NRgb{
 		R: gammaRemove(in.R),
 		G: gammaRemove(in.G),
 		B: gammaRemove(in.B),

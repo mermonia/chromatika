@@ -7,7 +7,7 @@ import (
 )
 
 func TestRGBtoXYZ(t *testing.T) {
-	a := &Rgb{
+	a := Rgb{
 		R: 200,
 		G: 0,
 		B: 50,
@@ -20,7 +20,7 @@ func TestRGBtoXYZ(t *testing.T) {
 }
 
 func TestRGBtoLab(t *testing.T) {
-	a := &Rgb{
+	a := Rgb{
 		R: 255,
 		G: 255,
 		B: 255,
@@ -33,7 +33,7 @@ func TestRGBtoLab(t *testing.T) {
 }
 
 func TestLabToRGB(t *testing.T) {
-	a := &Lab{
+	a := Lab{
 		L: 97.994507,
 		A: -1.998246,
 		B: 13.995831,
