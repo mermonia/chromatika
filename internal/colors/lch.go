@@ -37,7 +37,7 @@ func (c LCHab) MarshalText() ([]byte, error) {
 }
 
 func (c *LCHab) GetTemperature() float64 {
-	return math.Cos(float64(c.H) - 60)
+	return math.Cos(c.H - 60)
 }
 
 func (c *LCHab) ToHex() string {
@@ -64,7 +64,7 @@ func Darker(in *LCHab) *LCHab {
 	}
 }
 
-func LCHMix(a, b *LCHab, bias float32) *LCHab {
+func LCHMix(a, b *LCHab, bias float64) *LCHab {
 	aLab := LCHtoLab(a)
 	bLab := LCHtoLab(b)
 	mixLab := LabMix(aLab, bLab, bias)
@@ -74,8 +74,8 @@ func LCHMix(a, b *LCHab, bias float32) *LCHab {
 func LCHtoLab(in *LCHab) *Lab {
 	out := &Lab{
 		L: in.L,
-		A: in.C * float32(math.Cos(float64(in.H)*math.Pi/180)),
-		B: in.C * float32(math.Sin(float64(in.H)*math.Pi/180)),
+		A: in.C * math.Cos(in.H*math.Pi/180),
+		B: in.C * math.Sin(in.H*math.Pi/180),
 	}
 
 	return out
@@ -86,7 +86,7 @@ func LCHtoRGB(in *LCHab) (*Rgb, error) {
 	return LabToRGB(lab)
 }
 
-func RegularizeHue(h float32) float32 {
+func RegularizeHue(h float64) float64 {
 	if h < 0 {
 		return h + 360
 	}
@@ -96,10 +96,10 @@ func RegularizeHue(h float32) float32 {
 	return h
 }
 
-func RegularizeLuminosity(l float32) float32 {
+func RegularizeLuminosity(l float64) float64 {
 	return utils.Clamp(l, 0, 100)
 }
 
-func RegularizeChroma(c float32) float32 {
+func RegularizeChroma(c float64) float64 {
 	return utils.Clamp(c, 0, 150)
 }

@@ -64,7 +64,7 @@ func getPaletteFromCandidates(rawColors *RawColors, darkmode bool) (*Palette, er
 		result.Foreground = rawColors.DarkNeutral
 	}
 
-	contrasts := make([]float32, len(rawColors.Colors))
+	contrasts := make([]float64, len(rawColors.Colors))
 	for i, c := range rawColors.Colors {
 		contrast, err := wcag(result.Background, c)
 		if err != nil {
@@ -87,46 +87,46 @@ func getPaletteFromCandidates(rawColors *RawColors, darkmode bool) (*Palette, er
 	return result, nil
 }
 
-func sigmoid(x, center, k float64) float32 {
-	return float32(1.0 / (1.0 + math.Exp(-k*(x-center))))
+func sigmoid(x, center, k float64) float64 {
+	return 1.0 / (1.0 + math.Exp(-k*(x-center)))
 }
 
-func bell(x, center, sigma float64) float32 {
+func bell(x, center, sigma float64) float64 {
 	d := (x - center) / sigma
-	return float32(math.Exp(-0.5 * d * d))
+	return math.Exp(-0.5 * d * d)
 }
 
-func scorePrimary(c *colors.LCHab, bgContrast float32) float32 {
-	contrastScore := sigmoid(float64(bgContrast), 4.5, 1.2)
-	chromaScore := bell(float64(c.C), 55, 25)
+func scorePrimary(c *colors.LCHab, bgContrast float64) float64 {
+	contrastScore := sigmoid(bgContrast, 4.5, 1.2)
+	chromaScore := bell(c.C, 55, 25)
 
 	return contrastScore*0.6 + chromaScore*0.4
 }
 
-func scoreSecondary(candidate, primary *colors.LCHab, bgContrast float32) float32 {
-	deltaC := math.Abs(float64(candidate.C - primary.C))
-	deltaH := float64(utils.HueDifference(candidate.H, primary.H))
+func scoreSecondary(candidate, primary *colors.LCHab, bgContrast float64) float64 {
+	deltaC := math.Abs(candidate.C - primary.C)
+	deltaH := utils.HueDifference(candidate.H, primary.H)
 
-	contrastScore := sigmoid(float64(bgContrast), 4.5, 1.2)
+	contrastScore := sigmoid(bgContrast, 4.5, 1.2)
 	chromaScore := bell(deltaC, 8, 10)
 	hueScore := bell(deltaH, 30, 15)
 
 	return contrastScore*0.4 + chromaScore*0.3 + hueScore*0.3
 }
 
-func scoreAccent(candidate, primary *colors.LCHab, targetHue float32, bgContrast float32) float32 {
-	deltaC := math.Abs(float64(candidate.C - primary.C))
-	deltaH := float64(utils.HueDifference(candidate.H, targetHue))
+func scoreAccent(candidate, primary *colors.LCHab, targetHue float64, bgContrast float64) float64 {
+	deltaC := math.Abs(candidate.C - primary.C)
+	deltaH := utils.HueDifference(candidate.H, targetHue)
 
-	contrastScore := sigmoid(float64(bgContrast), 4.5, 1.2)
+	contrastScore := sigmoid(bgContrast, 4.5, 1.2)
 	chromaScore := bell(deltaC, 5, 15)
 	hueScore := bell(deltaH, 0, 12)
 
 	return contrastScore*0.2 + chromaScore*0.3 + hueScore*0.5
 }
 
-func getPrimaryColor(rawColors *RawColors, contrasts []float32) (*colors.LCHab, error) {
-	bestPrimaryScore := float32(math.Inf(-1))
+func getPrimaryColor(rawColors *RawColors, contrasts []float64) (*colors.LCHab, error) {
+	bestPrimaryScore := math.Inf(-1)
 	var bestPrimary *colors.LCHab
 	for i, c := range rawColors.Colors {
 		score := scorePrimary(c, contrasts[i])
@@ -143,8 +143,8 @@ func getPrimaryColor(rawColors *RawColors, contrasts []float32) (*colors.LCHab, 
 	return bestPrimary, nil
 }
 
-func getSecondaryColor(rawColors *RawColors, contrasts []float32, primary *colors.LCHab) *colors.LCHab {
-	bestSecondaryScore := float32(math.Inf(-1))
+func getSecondaryColor(rawColors *RawColors, contrasts []float64, primary *colors.LCHab) *colors.LCHab {
+	bestSecondaryScore := math.Inf(-1)
 	var bestSecondary *colors.LCHab
 	for i, c := range rawColors.Colors {
 		if c == primary {
@@ -168,10 +168,10 @@ func getSecondaryColor(rawColors *RawColors, contrasts []float32, primary *color
 	}
 }
 
-func getAccentColor(rawColors *RawColors, contrasts []float32, primary *colors.LCHab) *colors.LCHab {
+func getAccentColor(rawColors *RawColors, contrasts []float64, primary *colors.LCHab) *colors.LCHab {
 	targetHue := colors.RegularizeHue(primary.H + 180)
 
-	bestAccentScore := float32(math.Inf(-1))
+	bestAccentScore := math.Inf(-1)
 	var bestAccent *colors.LCHab
 	for i, c := range rawColors.Colors {
 		if c == primary {
@@ -212,15 +212,15 @@ func ansiColors(rawColors *RawColors) [8]*colors.LCHab {
 	return result
 }
 
-func getSimilarColorWithHue(rawColors *RawColors, hue float32) *colors.LCHab {
-	var avgL float32 = 0
-	var avgC float32 = 0
+func getSimilarColorWithHue(rawColors *RawColors, hue float64) *colors.LCHab {
+	var avgL float64 = 0
+	var avgC float64 = 0
 	for _, color := range rawColors.Colors {
 		avgL += color.L
 		avgC += color.C
 	}
-	avgL /= float32(len(rawColors.Colors))
-	avgC /= float32(len(rawColors.Colors))
+	avgL /= float64(len(rawColors.Colors))
+	avgC /= float64(len(rawColors.Colors))
 
 	return &colors.LCHab{
 		L: min(80, max(45, avgL)),

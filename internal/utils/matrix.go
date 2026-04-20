@@ -3,7 +3,7 @@ package utils
 import "fmt"
 
 type Matrix struct {
-	Data [][]float32
+	Data [][]float64
 }
 
 func (mat *Matrix) Dims() (int, int) {
@@ -14,11 +14,11 @@ func (mat *Matrix) Dims() (int, int) {
 	return len(mat.Data), len(mat.Data[0])
 }
 
-func (mat *Matrix) At(x, y int) float32 {
+func (mat *Matrix) At(x, y int) float64 {
 	return mat.Data[x][y]
 }
 
-func NewMatrix(data [][]float32) *Matrix {
+func NewMatrix(data [][]float64) *Matrix {
 	mat := &Matrix{
 		Data: data,
 	}
@@ -35,9 +35,9 @@ func (mat *Matrix) Mul(A, B *Matrix) error {
 		return fmt.Errorf("the number of columns of the first matrix must match the number of rows of the second one")
 	}
 
-	result := make([][]float32, rA)
+	result := make([][]float64, rA)
 	for i := range result {
-		result[i] = make([]float32, cB)
+		result[i] = make([]float64, cB)
 	}
 
 	for i, rowA := range A.Data {

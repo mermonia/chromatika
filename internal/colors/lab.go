@@ -27,18 +27,18 @@ func (c *Lab) String() string {
 }
 
 func (c *Lab) GetChroma() float64 {
-	return math.Sqrt(float64(c.A*c.A + c.B*c.B))
+	return math.Sqrt(c.A*c.A + c.B*c.B)
 }
 
 func (c *Lab) GetHue() float64 {
-	hue := math.Atan2(float64(c.B), float64(c.A)) * 180 / math.Pi
+	hue := math.Atan2(c.B, c.A) * 180 / math.Pi
 	if hue < 0 {
 		hue += 360
 	}
 	return hue
 }
 
-func LabMix(a, b *Lab, bias float32) *Lab {
+func LabMix(a, b *Lab, bias float64) *Lab {
 	return &Lab{
 		L: a.L*bias + b.L*(1-bias),
 		A: a.A*bias + b.A*(1-bias),
@@ -49,15 +49,15 @@ func LabMix(a, b *Lab, bias float32) *Lab {
 func LabToLCH(in *Lab) *LCHab {
 	out := &LCHab{
 		L: in.L,
-		C: float32(in.GetChroma()),
-		H: float32(in.GetHue()),
+		C: in.GetChroma(),
+		H: in.GetHue(),
 	}
 
 	return out
 }
 
 func LabToRGB(in *Lab) (*Rgb, error) {
-	workingMatData := [][]float32{
+	workingMatData := [][]float64{
 		{3.2404542, -1.5371385, -0.4985314},
 		{-0.9692660, 1.8760108, 0.0415560},
 		{0.0556434, -0.2040259, 1.0572252},
@@ -87,7 +87,7 @@ func LabToRGB(in *Lab) (*Rgb, error) {
 
 func LabToXyz(in *Lab) *Xyz {
 	// Reference white D65
-	var wX, wY, wZ float32
+	var wX, wY, wZ float64
 	wX, wY, wZ = 0.95047003, 1.0000001, 1.08883
 
 	// Transformations
@@ -96,8 +96,8 @@ func LabToXyz(in *Lab) *Xyz {
 	fZ := fY - (in.B / 200)
 
 	// Threshold values
-	var e float32 = 0.008856
-	var k float32 = 903.3
+	var e float64 = 0.008856
+	var k float64 = 903.3
 
 	// Normal values
 	x := fX * fX * fX
@@ -136,9 +136,9 @@ func compandedNRGB(in *NRgb) *NRgb {
 	return out
 }
 
-func compand(value float32) float32 {
+func compand(value float64) float64 {
 	if value <= 0.0031308 {
 		return value * 12.92
 	}
-	return float32(1.055*math.Pow(float64(value), 1/2.4) - 0.055)
+	return 1.055*math.Pow(value, 1/2.4) - 0.055
 }

@@ -1,21 +1,22 @@
 package logger
 
 import (
+	"github.com/fatih/color"
 	"io"
 	"log/slog"
 	"os"
-	"github.com/fatih/color"
 )
 
 var defaultHandler = NewCustomHandler(
 	os.Stdout,
 	&CustomOptions{
-		Level: slog.LevelInfo,
+		Level:  slog.LevelInfo,
 		HidePC: true,
 	},
 )
 
 var defaultLogger = slog.New(defaultHandler)
+
 func Debug(msg string, args ...any) {
 	defaultLogger.Debug(msg, args...)
 }
@@ -45,4 +46,3 @@ func SetWriter(out io.Writer) {
 	defaultHandler.out = out
 	defaultLogger = slog.New(defaultHandler)
 }
-

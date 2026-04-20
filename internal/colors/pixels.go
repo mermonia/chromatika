@@ -27,4 +27,3 @@ func PixelToRGB(in color.Color) *Rgb {
 
 	return out
 }
-

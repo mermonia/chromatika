@@ -113,21 +113,21 @@ func calculateCenters(cols []*colors.Lab, U [][]float64, np []int, m float64) []
 
 	// for each cluster, find its center
 	for c := range k {
-		var sumL, sumA, sumB float32
+		var sumL, sumA, sumB float64
 		var sumWeights float64
 
 		for i, color := range cols {
 			weight := math.Pow(U[i][c], m) * float64(np[i])
 			sumWeights += weight
-			sumL += color.L * float32(weight)
-			sumA += color.A * float32(weight)
-			sumB += color.B * float32(weight)
+			sumL += color.L * weight
+			sumA += color.A * weight
+			sumB += color.B * weight
 		}
 
 		centers[c] = &colors.Lab{
-			L: sumL / float32(sumWeights),
-			A: sumA / float32(sumWeights),
-			B: sumB / float32(sumWeights),
+			L: sumL / sumWeights,
+			A: sumA / sumWeights,
+			B: sumB / sumWeights,
 		}
 	}
 

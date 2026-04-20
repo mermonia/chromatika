@@ -5,7 +5,7 @@ import (
 )
 
 type Lab struct {
-	L, A, B float32
+	L, A, B float64
 }
 
 type Rgb struct {
@@ -13,19 +13,19 @@ type Rgb struct {
 }
 
 type NRgb struct {
-	R, G, B float32
+	R, G, B float64
 }
 
 type Xyz struct {
-	X, Y, Z float32
+	X, Y, Z float64
 }
 
 type LCHab struct {
-	L, C, H float32
+	L, C, H float64
 }
 
 func (col *NRgb) ToMatrix() *utils.Matrix {
-	data := [][]float32{
+	data := [][]float64{
 		{col.R},
 		{col.G},
 		{col.B},
@@ -35,7 +35,7 @@ func (col *NRgb) ToMatrix() *utils.Matrix {
 }
 
 func (col *Xyz) ToMatrix() *utils.Matrix {
-	data := [][]float32{
+	data := [][]float64{
 		{col.X},
 		{col.Y},
 		{col.Z},

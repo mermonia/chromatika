@@ -27,10 +27,3 @@ func DegSin(x float64) float64 {
 func DegCos(x float64) float64 {
 	return math.Cos(x * math.Pi / 180)
 }
-
-func Abs(x float32) float32 {
-	if x < 0 {
-		return -x
-	}
-	return x
-}

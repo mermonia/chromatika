@@ -38,9 +38,9 @@ func generateQuantizedColorArray(q int) []*colors.Lab {
 			for b := range levelsB {
 				// The center of the quantization bin is the representative color
 				cols[l*levelsA*levelsB+a*levelsB+b] = &colors.Lab{
-					L: float32(l*q) + float32(q)/2.0,
-					A: float32(a*q-120.0) + float32(q)/2.0,
-					B: float32(b*q-120.0) + float32(q)/2.0,
+					L: float64(l*q) + float64(q)/2.0,
+					A: float64(a*q-120.0) + float64(q)/2.0,
+					B: float64(b*q-120.0) + float64(q)/2.0,
 				}
 			}
 		}
@@ -53,9 +53,9 @@ func getColorIndex(q int, color *colors.Lab) int {
 	levelsA := 240 / q
 	levelsB := 240 / q
 
-	l := int(color.L / float32(q))
-	a := int((color.A + 120.0) / float32(q))
-	b := int((color.B + 120.0) / float32(q))
+	l := int(color.L / float64(q))
+	a := int((color.A + 120.0) / float64(q))
+	b := int((color.B + 120.0) / float64(q))
 
 	l = utils.Clamp(l, 0, 100/q-1)
 	a = utils.Clamp(a, 0, 240/q-1)
