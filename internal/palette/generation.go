@@ -12,10 +12,10 @@ import (
 
 const N_INITIAL_CLUSTERS = 16
 const N_CLUSTERS_STEP = 4
-const SEARCH_ITERATIONS = 3
+const SEARCH_ITERATIONS = 2
 
 const N_CANDIDATES = 8
-const MIN_DELTAE00 = 20
+const MIN_DELTAE00 = 15
 
 func GeneratePalette(cfg *GenerationConfig) (*Palette, error) {
 	/*
@@ -50,55 +50,41 @@ func GeneratePalette(cfg *GenerationConfig) (*Palette, error) {
 
 	rawColors := generateCompleteCandidates(suitableColors)
 
-	if cfg.DarkMode {
-		return getDarkModePalette(rawColors)
-	}
-	return getLightModePalette(rawColors)
-
+	return getPaletteFromCandidates(rawColors, cfg.DarkMode)
 }
 
-func getDarkModePalette(rawColors *RawColors) (*Palette, error) {
-	primary, secondary, accent, err := accentColors(rawColors)
-	if err != nil {
-		return nil, fmt.Errorf("could not obtain primary colors: %w", err)
+func getPaletteFromCandidates(rawColors *RawColors, darkmode bool) (*Palette, error) {
+	result := &Palette{}
+
+	if darkmode {
+		result.Background = rawColors.DarkNeutral
+		result.Foreground = rawColors.LightNeutral
+	} else {
+		result.Background = rawColors.LightNeutral
+		result.Foreground = rawColors.DarkNeutral
 	}
 
-	ansiColors := ansiColors(rawColors)
-	ansiLighterColors := ansiLighterColors(ansiColors, true)
-
-	return &Palette{
-		Background: rawColors.DarkNeutral,
-		Foreground: rawColors.LightNeutral,
-
-		Primary: primary,
-		Secondary: secondary,
-		Accent: accent,
-
-		ANSIBase: [8]*colors.LCHab(ansiColors),
-		ANSILighter: [8]*colors.LCHab(ansiLighterColors),
-	}, nil
-}
-
-func getLightModePalette(rawColors *RawColors) (*Palette, error) {
-	primary, secondary, accent, err := accentColors(rawColors)
-	if err != nil {
-		return nil, fmt.Errorf("could not obtain primary colors: %w", err)
+	contrasts := make([]float32, len(rawColors.Colors))
+	for i, c := range rawColors.Colors {
+		contrast, err := wcag(result.Background, c)
+		if err != nil {
+			return nil, fmt.Errorf("could not calculate wcag: %w", err)
+		}
+		contrasts[i] = contrast
 	}
 
-	ansiColors := ansiColors(rawColors)
-	ansiLighterColors := ansiLighterColors(ansiColors, false)
+	primary, err := getPrimaryColor(rawColors, contrasts)
+	if err != nil {
+		return nil, fmt.Errorf("could not find a suitable primary color: %w", err)
+	}
 
-	return &Palette{
-		Background: rawColors.LightNeutral,
-		Foreground: rawColors.DarkNeutral,
+	result.Primary = primary
+	result.Secondary = getSecondaryColor(rawColors, contrasts, primary)
+	result.Accent = getAccentColor(rawColors, contrasts, primary)
+	result.ANSIBase = ansiColors(rawColors)
+	result.ANSILighter = ansiLighterColors(result.ANSIBase, darkmode)
 
-		Primary: primary,
-		Secondary: secondary,
-		Accent: accent,
-
-		ANSIBase: ansiColors,
-		ANSILighter: ansiLighterColors,
-	}, nil
+	return result, nil
 }
 
 func sigmoid(x, center, k float64) float32 {
@@ -110,141 +96,104 @@ func bell(x, center, sigma float64) float32 {
 	return float32(math.Exp(-0.5 * d * d))
 }
 
-func scorePrimary(c *colors.LCHab, darkContrast, lightContrast float32) float32 {
-	// Best contrast against either neutral — reward versatility
-	bestContrast := math.Max(float64(darkContrast), float64(lightContrast))
-	contrastScore := sigmoid(bestContrast, 4.5, 1.2)
-
-	// Chroma: vivid but not garish
+func scorePrimary(c *colors.LCHab, bgContrast float32) float32 {
+	contrastScore := sigmoid(float64(bgContrast), 4.5, 1.2)
 	chromaScore := bell(float64(c.C), 55, 25)
 
 	return contrastScore*0.6 + chromaScore*0.4
 }
 
-func scoreSecondary(candidate, primary *colors.LCHab) float32 {
+func scoreSecondary(candidate, primary *colors.LCHab, bgContrast float32) float32 {
 	deltaC := math.Abs(float64(candidate.C - primary.C))
 	deltaH := float64(utils.HueDifference(candidate.H, primary.H))
 
-	// Similar but slightly less chromatic
+	contrastScore := sigmoid(float64(bgContrast), 4.5, 1.2)
 	chromaScore := bell(deltaC, 8, 10)
-
-	// Analogous hue — close but not identical
 	hueScore := bell(deltaH, 30, 15)
 
-	return chromaScore*0.5 + hueScore*0.5
+	return contrastScore*0.4 + chromaScore*0.3 + hueScore*0.3
 }
 
-func scoreAccent(candidate, primary, secondary *colors.LCHab, targetHue float32) float32 {
+func scoreAccent(candidate, primary *colors.LCHab, targetHue float32, bgContrast float32) float32 {
 	deltaC := math.Abs(float64(candidate.C - primary.C))
 	deltaH := float64(utils.HueDifference(candidate.H, targetHue))
 
-	// Similar chroma to primary
+	contrastScore := sigmoid(float64(bgContrast), 4.5, 1.2)
 	chromaScore := bell(deltaC, 5, 15)
-
-	// Close to target hue
 	hueScore := bell(deltaH, 0, 12)
 
-	// Penalize if too similar to secondary
-	secondaryDeltaH := float64(utils.HueDifference(candidate.H, secondary.H))
-	separationScore := sigmoid(secondaryDeltaH, 20, 0.3)
-
-	return chromaScore*0.45 + hueScore*0.45 + separationScore*0.1
+	return contrastScore*0.2 + chromaScore*0.3 + hueScore*0.5
 }
 
-func accentColors(rawColors *RawColors) (*colors.LCHab, *colors.LCHab, *colors.LCHab, error) {
+func getPrimaryColor(rawColors *RawColors, contrasts []float32) (*colors.LCHab, error) {
 	bestPrimaryScore := float32(math.Inf(-1))
-	bestPrimaryIdx := -1
-
-	fmt.Printf("available candidates: %s\n", rawColors.Colors)
-
+	var bestPrimary *colors.LCHab
 	for i, c := range rawColors.Colors {
-		darkContrast, err := wcag(rawColors.DarkNeutral, c)
-		if err != nil {
-			return nil, nil, nil, fmt.Errorf("wcag dark: %w", err)
-		}
-		lightContrast, err := wcag(rawColors.LightNeutral, c)
-		if err != nil {
-			return nil, nil, nil, fmt.Errorf("wcag light: %w", err)
-		}
-		score := scorePrimary(c, darkContrast, lightContrast)
+		score := scorePrimary(c, contrasts[i])
 		if score > bestPrimaryScore {
 			bestPrimaryScore = score
-			bestPrimaryIdx = i
+			bestPrimary = c
 		}
 	}
 
-	if bestPrimaryIdx == -1 {
-		return nil, nil, nil, fmt.Errorf("no colors available")
+	if bestPrimary == nil {
+		return nil, fmt.Errorf("no colors available")
 	}
 
-	primary := rawColors.Colors[bestPrimaryIdx]
+	return bestPrimary, nil
+}
 
-	// --- Secondary: scored, analogous hue, different lightness ---
+func getSecondaryColor(rawColors *RawColors, contrasts []float32, primary *colors.LCHab) *colors.LCHab {
 	bestSecondaryScore := float32(math.Inf(-1))
 	var bestSecondary *colors.LCHab
-
 	for i, c := range rawColors.Colors {
-		if i == bestPrimaryIdx {
+		if c == primary {
 			continue
 		}
-		score := scoreSecondary(c, primary)
+		score := scoreSecondary(c, primary, contrasts[i])
 		if score > bestSecondaryScore {
 			bestSecondaryScore = score
 			bestSecondary = c
 		}
-
-		fmt.Printf("color %d sec score: %f\n", i, score)
 	}
 
-	var secondary *colors.LCHab
-	if bestSecondary != nil && bestSecondaryScore > 0.3 {
-		secondary = bestSecondary
-	} else {
-		secondary = &colors.LCHab{
-			L: colors.RegularizeLuminosity(primary.L - 15),
-			C: colors.RegularizeChroma(primary.C - 8),
-			H: colors.RegularizeHue(primary.H + 30),
-		}
+	if bestSecondary != nil && bestSecondaryScore > 0.5 {
+		return bestSecondary
 	}
 
-	// --- Accent: triadic offset from primary, away from secondary ---
-	hueDelta := float32(30)
-	diff := utils.SignedHueDifference(primary.H, secondary.H)
-	if diff < 0 {
-		// Secondary is on the +H side, push accent the other way
-		hueDelta = -30
+	return &colors.LCHab{
+		L: colors.RegularizeLuminosity(primary.L - 15),
+		C: colors.RegularizeChroma(primary.C - 8),
+		H: colors.RegularizeHue(primary.H + 30),
 	}
-	targetHue := colors.RegularizeHue(primary.H + hueDelta)
-	fmt.Printf("pH: %f, sH: %f, diff: %f, target: %f\n", primary.H, secondary.H, diff, targetHue)
+}
+
+func getAccentColor(rawColors *RawColors, contrasts []float32, primary *colors.LCHab) *colors.LCHab {
+	targetHue := colors.RegularizeHue(primary.H + 180)
 
 	bestAccentScore := float32(math.Inf(-1))
 	var bestAccent *colors.LCHab
-
 	for i, c := range rawColors.Colors {
-		if i == bestPrimaryIdx {
+		if c == primary {
 			continue
 		}
-		score := scoreAccent(c, primary, secondary, targetHue)
+
+		score := scoreAccent(c, primary, targetHue, contrasts[i])
 		if score > bestAccentScore {
 			bestAccentScore = score
 			bestAccent = c
 		}
-
-		fmt.Printf("color %d accent score: %f\n", i, score)
 	}
 
-	var accent *colors.LCHab
-	if bestAccent != nil && bestAccentScore > 0.3 {
-		accent = bestAccent
-	} else {
-		accent = &colors.LCHab{
-			L: colors.RegularizeLuminosity(primary.L - 10),
-			C: colors.RegularizeChroma(primary.C),
-			H: targetHue,
-		}
+	if bestAccent != nil && bestAccentScore > 0.5 {
+		return bestAccent
 	}
 
-	return primary, secondary, accent, nil
+	return &colors.LCHab{
+		L: colors.RegularizeLuminosity(primary.L - 5),
+		C: colors.RegularizeChroma(primary.C - 5),
+		H: targetHue,
+	}
 }
 
 func ansiColors(rawColors *RawColors) [8]*colors.LCHab {
@@ -274,8 +223,8 @@ func getSimilarColorWithHue(rawColors *RawColors, hue float32) *colors.LCHab {
 	avgC /= float32(len(rawColors.Colors))
 
 	return &colors.LCHab{
-		L: min(80, max(45,avgL)),
-		C: min(60, max(40,avgC)),
+		L: min(80, max(45, avgL)),
+		C: min(60, max(40, avgC)),
 		H: hue,
 	}
 }
@@ -291,7 +240,7 @@ func ansiLighterColors(baseAnsi [8]*colors.LCHab, darkmode bool) [8]*colors.LCHa
 	return result
 }
 
-func derivedColor(base *colors.LCHab, darkmode bool) *colors.LCHab  {
+func derivedColor(base *colors.LCHab, darkmode bool) *colors.LCHab {
 	if darkmode {
 		return &colors.LCHab{
 			L: base.L * 0.94,
