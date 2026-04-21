@@ -33,12 +33,10 @@ func (*ASCIIPaletteFormatter) Format(pal *palette.Palette) string {
 	res += fmt.Sprintf("Secondary:  %s\n", pal.Secondary)
 	res += fmt.Sprintf("Accent:     %s\n", pal.Accent)
 
-	for i, color := range pal.ANSIBase {
-		res += fmt.Sprintf("Color[%d]: %s\n", i, color)
-	}
+	res += "\n"
 
-	for i, color := range pal.ANSILighter {
-		res += fmt.Sprintf("Derived Color[%d]: %s\n", i, color)
+	for i := range 8 {
+		res += fmt.Sprintf("Color[%d]:   %s %s\n", i, pal.ANSIBase[i], pal.ANSILighter[i])
 	}
 
 	return res
