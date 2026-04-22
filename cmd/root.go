@@ -24,6 +24,7 @@ func Execute() {
 			&ExtractCommand,
 			&PaletteCommand,
 			&AnalyzeCommand,
+			&VariantsCommand,
 		},
 	}
 
