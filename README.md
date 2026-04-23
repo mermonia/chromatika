@@ -17,7 +17,7 @@ Chromatika is a lightweight image color extraction tool and palette generator wr
 Make sure you have **Go 1.25.5+** installed
 
 ```bash
-go install github.com/mermonia/chromatika@v0.1.0
+go install github.com/mermonia/chromatika@v0.1.1
 ```
 
 The binary will be installed in $GOPATH/bin (usually ~/go/bin).
