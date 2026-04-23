@@ -4,14 +4,14 @@ import "github.com/mermonia/chromatika/internal/colors"
 
 type Variants struct {
 	BaseIndex int
-	Variant_50,
-	Variant_100,
-	Variant_200,
-	Variant_300,
-	Variant_400,
-	Variant_500,
-	Variant_600,
-	Variant_700,
-	Variant_800,
-	Variant_900 colors.LCHab
+	Variant50,
+	Variant100,
+	Variant200,
+	Variant300,
+	Variant400,
+	Variant500,
+	Variant600,
+	Variant700,
+	Variant800,
+	Variant900 colors.LCHab
 }

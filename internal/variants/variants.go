@@ -22,17 +22,17 @@ func GenerateVariants(base colors.LCHab) *Variants {
 	cols := generateVariantsFromAnchor(base, anchor)
 
 	return &Variants{
-		BaseIndex:   anchor,
-		Variant_50:  cols[0],
-		Variant_100: cols[1],
-		Variant_200: cols[2],
-		Variant_300: cols[3],
-		Variant_400: cols[4],
-		Variant_500: cols[5],
-		Variant_600: cols[6],
-		Variant_700: cols[7],
-		Variant_800: cols[8],
-		Variant_900: cols[9],
+		BaseIndex:  anchor,
+		Variant50:  cols[0],
+		Variant100: cols[1],
+		Variant200: cols[2],
+		Variant300: cols[3],
+		Variant400: cols[4],
+		Variant500: cols[5],
+		Variant600: cols[6],
+		Variant700: cols[7],
+		Variant800: cols[8],
+		Variant900: cols[9],
 	}
 }
 
