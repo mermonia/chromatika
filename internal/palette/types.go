@@ -5,7 +5,8 @@ import (
 )
 
 type Palette struct {
-	// Special colors
+	Darkmode bool
+
 	Background,
 	Foreground,
 

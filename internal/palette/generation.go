@@ -54,7 +54,7 @@ func GeneratePalette(cfg *GenerationConfig) (*Palette, error) {
 }
 
 func getPaletteFromCandidates(rawColors *RawColors, darkmode bool) (*Palette, error) {
-	result := &Palette{}
+	result := &Palette{Darkmode: darkmode}
 
 	if darkmode {
 		result.Background = rawColors.DarkNeutral
