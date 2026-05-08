@@ -12,7 +12,7 @@ type FCMParameters struct {
 	B, K int
 }
 
-func FCM(cols []colors.Lab, np []int, params FCMParameters) ([]colors.Lab, [][]float64, error) {
+func FCM(cols []colors.Lab, np []int, params FCMParameters) ([]colors.Lab, []float64, error) {
 	// Pre-calculation of color distances
 	distanceMat := colors.DistanceMatrix(cols)
 
@@ -44,7 +44,20 @@ func FCM(cols []colors.Lab, np []int, params FCMParameters) ([]colors.Lab, [][]f
 		iters++
 	}
 
-	return centers, partitionMat, nil
+	// Weight calculation
+	weights := make([]float64, params.K)
+	var totalWeight float64
+	for c := range params.K {
+		for i := range cols {
+			weights[c] += math.Pow(partitionMat[i][c], params.M) * float64(np[i])
+		}
+		totalWeight += weights[c]
+	}
+	for c := range params.K {
+		weights[c] /= totalWeight
+	}
+
+	return centers, weights, nil
 }
 
 func calculateDifference(a, b []colors.Lab) float64 {

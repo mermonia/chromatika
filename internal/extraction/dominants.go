@@ -9,7 +9,7 @@ import (
 	"github.com/mermonia/chromatika/internal/quantization"
 )
 
-func GetDominantColors(path string, scaleW, quantInterval int, paramsFCM clustering.FCMParameters) ([]colors.Lab, [][]float64, error) {
+func GetDominantColors(path string, scaleW, quantInterval int, paramsFCM clustering.FCMParameters) ([]colors.Lab, []float64, error) {
 	pixels, err := input.ReadImage(path, scaleW)
 	if err != nil {
 		return nil, nil, fmt.Errorf("could not read image: %w", err)
@@ -22,10 +22,10 @@ func GetDominantColors(path string, scaleW, quantInterval int, paramsFCM cluster
 
 	quantizedColors, np := quantization.Quantize(quantInterval, labColors)
 
-	extractedColors, partMatrix, err := clustering.FCM(quantizedColors, np, paramsFCM)
+	extractedColors, weights, err := clustering.FCM(quantizedColors, np, paramsFCM)
 	if err != nil {
 		return nil, nil, fmt.Errorf("could not execute fcm: %w", err)
 	}
 
-	return extractedColors, partMatrix, nil
+	return extractedColors, weights, nil
 }
