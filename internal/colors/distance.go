@@ -33,6 +33,15 @@ func DistanceMatrix(colors []Lab) [][]float64 {
 	return res
 }
 
+func HueDistance(a, b float64) float64 {
+	distance := math.Abs(a - b)
+	return math.Min(distance, 360-distance)
+}
+
+func SignedHueDistance(from, to float64) float64 {
+	return math.Mod(to-from+540, 360) - 180
+}
+
 func (a Lab) Equals(b Lab) bool {
 	if a.L != b.L || a.A != b.A || a.B != b.B {
 		return false
