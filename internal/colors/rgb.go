@@ -22,7 +22,7 @@ func (c Rgb) String() string {
 }
 
 func (c Rgb) ToHex() string {
-	return fmt.Sprintf("%x%x%x", c.R, c.G, c.B)
+	return fmt.Sprintf("%02x%02x%02x", c.R, c.G, c.B)
 }
 
 func RGBtoNRGB(in Rgb) NRgb {
@@ -133,5 +133,5 @@ func gammaRemove(value float64) float64 {
 		return value / 12.92
 	}
 
-	return math.Pow((value + 0.055/1.055), 2.4)
+	return math.Pow(((value + 0.055) / 1.055), 2.4)
 }
