@@ -20,6 +20,10 @@ func Clamp[T Number](n, min, max T) T {
 	return n
 }
 
+func Clamp01[T Number](n T) T {
+	return Clamp(n, 0, 1)
+}
+
 func DegSin(x float64) float64 {
 	return math.Sin(x * math.Pi / 180)
 }
