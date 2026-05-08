@@ -9,15 +9,16 @@ Chromatika is a lightweight image color extraction tool and palette generator wr
 - Extract the dominant colors of an image via Fuzzy C-Means clustering over a quantized Lab color space.
 - Generate harmonious palettes from an image's dominant colors.
 - Export generated palettes with different formats.
+- Generate luminosity variants based on a given color.
 
 ---
 
 ## Installation
 
-Make sure you have **Go 1.25.5+** installed
+Make sure you have **Go 1.25.5+** installed, and run:
 
 ```bash
-go install github.com/mermonia/chromatika@v0.1.1
+go install github.com/mermonia/chromatika@v0.1.3
 ```
 
 The binary will be installed in $GOPATH/bin (usually ~/go/bin).
@@ -95,9 +96,9 @@ for each bin (section) is its center.
 
 ## Output formats
 
-For now, there are only 2 available output formats for the **palette** command (ascii and toml),
-while the **extract** command always outputs a list of hex colors. In the near future, both commands will
-include ascii, toml, hex and json formats.
+For now, there are only 2 available output formats for the **palette** command (ASCII and TOML),
+while the **extract** command always outputs a list of HEX colors. In the near future, both commands will
+include ASCII, TOML, HEX and JSON formats.
 
 ---
 
