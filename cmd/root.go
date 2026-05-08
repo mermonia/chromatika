@@ -12,7 +12,7 @@ func Execute() {
 	cmd := &cli.Command{
 		Name:                  "chromatika",
 		EnableShellCompletion: true,
-		Version:               "v0.1.1",
+		Version:               "v0.1.3",
 		Authors: []any{
 			"Daniel Sanso <cs.daniel.sanso@gmail.com>",
 		},
