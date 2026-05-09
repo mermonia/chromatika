@@ -385,7 +385,6 @@ func scoreAccentColor(candidate Candidate, primary colors.LCHab) float64 {
 }
 
 func fallbackAccentColor(primary colors.LCHab) colors.LCHab {
-	fmt.Printf("primary hue: %f; synthetic hue: %f\n", primary.H, colors.RegularizeHue(primary.H+180))
 	return colors.LCHab{
 		L: primary.L,
 		C: math.Max(colors.RegularizeChroma(primary.C+10), 50),
