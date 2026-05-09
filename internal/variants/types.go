@@ -3,7 +3,6 @@ package variants
 import "github.com/mermonia/chromatika/internal/colors"
 
 type Variants struct {
-	BaseIndex int
 	Variant50,
 	Variant100,
 	Variant200,

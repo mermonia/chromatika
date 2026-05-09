@@ -24,7 +24,7 @@ func (*TOMLVariantsFormatter) Format(vars *variants.Variants) string {
 }
 
 func (*ASCIIVariantsFormatter) Format(vars *variants.Variants) string {
-	res := fmt.Sprintf("%s%s%s%s%s%s%s%s%s%s\nBase Index: %d",
+	res := fmt.Sprintf("%s%s%s%s%s%s%s%s%s%s\n",
 		vars.Variant50,
 		vars.Variant100,
 		vars.Variant200,
@@ -34,8 +34,7 @@ func (*ASCIIVariantsFormatter) Format(vars *variants.Variants) string {
 		vars.Variant600,
 		vars.Variant700,
 		vars.Variant800,
-		vars.Variant900,
-		vars.BaseIndex)
+		vars.Variant900)
 
 	return res
 }
